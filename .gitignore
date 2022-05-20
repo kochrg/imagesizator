@@ -1,6 +1,7 @@
+__pycache__/
 db.sqlite3
 *.env
 
 
 ## Never ignore
-!settings-sample.env
+!settings.sample-env
