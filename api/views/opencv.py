@@ -2,8 +2,7 @@ from fileinput import filename
 from tempfile import TemporaryFile, NamedTemporaryFile
 from django.contrib.auth import get_user_model
 from django.views.decorators.csrf import csrf_exempt
-from django.http import JsonResponse, HttpResponse
-from django.core.files.base import ContentFile
+from django.http import JsonResponse
 from rest_framework.generics import RetrieveAPIView
 from rest_framework import permissions
 
@@ -12,7 +11,7 @@ import cv2
 
 
 # User must be logged to use this endpoint.
-# Use 'Authorization: Token the_token' header
+# Use 'Authorization: Token the_token' header.
 class OpenCVImageResize(RetrieveAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -25,7 +24,7 @@ class OpenCVImageResize(RetrieveAPIView):
             # action = request.data["action"] - NOT USED -
             to_width = int(request.data["to_width"])
             to_height = int(request.data["to_height"])
-            suffix = '.' + request.data["suffix"]
+            suffix = request.data["suffix"]
             
             # bytes image in format: base64.b64.encode(image).decode('utf8')
             image = base64.b64decode(request.data["image"])
@@ -51,16 +50,13 @@ class OpenCVImageResize(RetrieveAPIView):
                         'status': 'resized',
                         'width': to_width,
                         'height': to_height,
+                        'suffix': suffix,
                         'image': string_image,
                     }
                     response_code = 200
 
-                    # # ---------------- TESTING --------------------
-                    # with open("/tmp/skyline_testing_rebuild.jpg", "wb") as rebuild_image:
-                    #     rebuild_image.write(base64.b64decode(string_image))
-                    #     rebuild_image.close()
-                    # # ---------------------------------------------
-
+                    # TODO: check if it is possible to close (and then delete)
+                    # file asynchonously
                     resized_image_file.close()
                     f.close()
         except Exception as e:
