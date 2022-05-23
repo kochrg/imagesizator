@@ -25,30 +25,39 @@ class OpenCVImageResize(RetrieveAPIView):
         # action = request.data["action"] - NOT USED -
         to_width = int(request.data["to_width"])
         to_height = int(request.data["to_height"])
-        image = base64.b64decode(request.data["image"])  # bytes image
+        print(str(request.data["image"]))
+        image = base64.b64decode(str(request.data["image"])) # bytes image
 
-        with NamedTemporaryFile(delete=False) as f:
+        print(image)
+
+        with NamedTemporaryFile("wb", delete=False) as f:
             f.write(image)
             f.close()
             processed_image = cv2.imread(f.name)
             processed_image = cv2.resize(processed_image, (to_width, to_height))
+
             # processed_image = cv2.imencode('.jpg', processed_image)
-            # cv2.imwrite("/tmp/skyline_resized.jpg", processed_image)            
+            cv2.imwrite("/tmp/skyline_resized.jpg", processed_image)            
 
-            # cap = cv2.VideoCapture(0)
-            # retval, image = cap.read()
-            # retval, buffer = cv2.imencode('.jpg', image)
-            # jpg_as_text = base64.b64encode(buffer)
-            # print(jpg_as_text)
-            # cap.release()
+            with open("/tmp/skyline_resized.jpg", "rb") as processed_image:
+                img_bytes = processed_image.read()
+                string_image = base64.b64encode(img_bytes).decode('utf8')
 
-            response_data = {
-                'status': 'resized',
-                'width': to_width,
-                'height': to_height,
-                'image': str(base64.b64encode(processed_image).decode("utf8")),
-            }
-            response_code = 200
+                response_data = {
+                    'status': 'resized',
+                    'width': to_width,
+                    'height': to_height,
+                    'image': string_image,
+                }
+                response_code = 200
+
+                # ---------------- TESTING --------------------
+                with open("/tmp/skyline_testing_rebuild.jpg", "wb") as rebuild_image:
+                    rebuild_image.write(base64.b64decode(string_image))
+                    rebuild_image.close()
+                # ---------------------------------------------
+
+                processed_image.close()
         # except Exception as e:
         #     print(e)
 
