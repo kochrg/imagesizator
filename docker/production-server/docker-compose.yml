@@ -6,8 +6,7 @@ services:
     build:
       context: ../../
       dockerfile: ./docker/dockerfiles/production-web-dockerfile/Dockerfile
-    command: bash -c "python3 manage.py docker_db_check
-            && pip install -r requirements.txt
+    command: bash -c "pip install -r requirements.txt
             && python3 manage.py migrate --noinput
             && python3 manage.py initadmin
             && apachectl -D FOREGROUND"
