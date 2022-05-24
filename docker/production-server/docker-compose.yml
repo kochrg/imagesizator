@@ -1,27 +1,11 @@
 version: "3.9"
 
 services:
-  psqlserver:
-    container_name: psql-container
-    image: "postgres" # Latest image 
-    environment:
-      - POSTGRES_PASSWORD=maplerarg159753.
-      - POSTGRES_USER=maple
-      - POSTGRES_DB=apimutual
-    volumes:
-      - ../dockerfiles/postgresql/conf/postgresql.conf:/etc/postgresql/postgresql.conf
-      - ../dockerfiles/postgresql/data/:/var/lib/postgresql/data/
-    restart: unless-stopped
-    ports:
-      - "5432:5432"
-    networks:
-      static-network:
-        ipv4_address: 192.168.22.4
   web-server:
-    container_name: api-container
+    container_name: imagesizator-container
     build:
       context: ../../
-      dockerfile: ./docker/dockerfiles/staging-web-dockerfile/Dockerfile
+      dockerfile: ./docker/dockerfiles/production-web-dockerfile/Dockerfile
     command: bash -c "python3 manage.py docker_db_check
             && pip install -r requirements.txt
             && python3 manage.py migrate --noinput
@@ -29,26 +13,15 @@ services:
             && apachectl -D FOREGROUND"
     volumes:
       # Mapping project-root folder with apache-root folder
-      - ../../:/var/www/api-mutual
+      - ../../:/var/www/imagesizator
       # Mapping files used in production server
-      - ../dockerfiles/staging-web-dockerfile/conf/django/manage.py:/var/www/api-mutual/manage.py
-      - ../dockerfiles/staging-web-dockerfile/conf/django/pytest.ini:/var/www/api-mutual/pytest.ini
-      - ../dockerfiles/staging-web-dockerfile/conf/django/asgi.py:/var/www/api-mutual/apimutual/asgi.py
-      - ../dockerfiles/staging-web-dockerfile/conf/django/wsgi.py:/var/www/api-mutual/apimutual/wsgi.py
+      - ../dockerfiles/production-web-dockerfile/conf/django/manage.py:/var/www/imagesizator/manage.py
+      - ../dockerfiles/production-web-dockerfile/conf/django/pytest.ini:/var/www/imagesizator/pytest.ini
+      - ../dockerfiles/production-web-dockerfile/conf/django/asgi.py:/var/www/imagesizator/imagesizator/asgi.py
+      - ../dockerfiles/production-web-dockerfile/conf/django/wsgi.py:/var/www/imagesizator/imagesizator/wsgi.py
+      # Mapping database
+      - ../../db.sqlite3:/var/www/imagesizator/db.sqlite3
     restart: unless-stopped
-    depends_on:
-      - psqlserver
     ports:
       - "80:80"
       - "443:443"
-    networks:
-      static-network:
-        ipv4_address: 192.168.22.2
-
-
-networks:
-  static-network:
-    name: apimutual-network
-    ipam:
-      config:
-        - subnet: 192.168.22.0/24

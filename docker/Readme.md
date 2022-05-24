@@ -7,7 +7,7 @@
 - Execute ``docker-compose up``
 
 **NOTE:**
-If ERROR ``'can't stat 'some-url/api-mutual/docker/dockerfiles/postgresql/data''`` appears when
+If ERROR ``'can't stat 'some-url/imagesizator/docker/dockerfiles/postgresql/data''`` appears when
 execute ``docker-compose up`` then open a terminal and go to *docker* folder.
 
 SOLUTION:

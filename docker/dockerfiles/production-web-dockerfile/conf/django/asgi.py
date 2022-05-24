@@ -1,5 +1,5 @@
 """
-ASGI config for apimutual project.
+ASGI config for imagesizator project.
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 
@@ -11,6 +11,6 @@ import os
 
 from django.core.asgi import get_asgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'apimutual.settings.prod')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'imagesizator.settings_prod')
 
 application = get_asgi_application()
