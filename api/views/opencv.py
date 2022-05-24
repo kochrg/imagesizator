@@ -26,7 +26,7 @@ class OpenCVImageResize(RetrieveAPIView):
             to_height = int(request.data["to_height"])
             suffix = request.data["suffix"]
             
-            # bytes image in format: base64.b64.encode(image).decode('utf8')
+            # bytes image in format: base64.b64encode(image).decode('utf8')
             image = base64.b64decode(request.data["image"])
 
             # Need to save the image from request because cv2.imread only works with a path
@@ -56,7 +56,7 @@ class OpenCVImageResize(RetrieveAPIView):
                     response_code = 200
 
                     # TODO: check if it is possible to close (and then delete)
-                    # file asynchonously
+                    # files asynchonously
                     resized_image_file.close()
                     f.close()
         except Exception as e:
