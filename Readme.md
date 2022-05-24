@@ -14,10 +14,13 @@ To run a command from Terminal:
 
 ## Resizing with OpenCV
 **Endpoint URI:** ``/images/opencv``
+
 **Method:** POST
+
 **Headers:**
 - ``Authorization: Token authorized_user_token``
 - ``Content-Type: application/json``
+
 **Data:**
 ```
 {
