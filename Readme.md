@@ -3,6 +3,7 @@ Imagesizator can receive an image through an HTTP or HTTPS endpoint, manipulate 
 
 ## First Steps
 1. On root folder rename the file ``settings.sample-env`` to ``.env`` and change the ``SECRET_KEY=`` value.
+2. Go to *docker/dockerfiles/production-web-dockerfile/conf/ssl* and run: ``./create-certificates.sh``.
 
 ### How to get the *image_as_string* in Python:
 ```

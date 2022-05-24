@@ -5,6 +5,9 @@
 FROM ubuntu:21.04
 WORKDIR /var/www/imagesizator/
 
+ENV TZ=America/Argentina
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
 # Install needed packages
 RUN apt update
 RUN apt upgrade -y
@@ -18,18 +21,13 @@ RUN apt install apache2 -y
 # Create self-signed certificates by default
 # Replace inside ssl folder to use custom certificates
 # Installing certificates
-RUN apt-get install -y openssl && \
-    mkdir /etc/ssl/server-certificates && \
-    cd /etc/ssl/server-certificates && \
-    openssl req -newkey rsa:2048 -nodes -keyout server-key.pem -x509 -days 365 -out server-certificate.pem && \
-    openssl x509 -text -noout -in server-certificate.pem && \
-    openssl pkcs12 -inkey key.pem -in server-certificate.pem -export -out server-certificate.p12 && \
-    openssl pkcs12 -in server-certificate.p12 -noout -info
+RUN apt-get install -y openssl
 
-RUN cp /etc/ssl/server-certificates/* /etc/apache2/ssl/.
+# Installing certificates
+COPY ./docker/dockerfiles/production-web-dockerfile/conf/ssl/server-certificates/* /etc/apache2/ssl/
 
 # Adding MinTLSV1 compatibility
-COPY ./docker/dockerfiles/production-web-dockerfile/conf/openssl.cnf /etc/ssl/
+# COPY ./docker/dockerfiles/production-web-dockerfile/conf/openssl.cnf /etc/ssl/
 
 # Config project env
 RUN apt install python3.9 python3.9-dev python3.9-distutils python3-pip python3.9-venv -y
