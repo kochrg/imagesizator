@@ -10,16 +10,6 @@ services:
             && python3 manage.py migrate --noinput
             && python3 manage.py initadmin
             && apachectl -D FOREGROUND"
-    volumes:
-      # Mapping project-root folder with apache-root folder
-      - ../../:/var/www/imagesizator
-      # Mapping files used in production server
-      - ../dockerfiles/production-web-dockerfile/conf/django/manage.py:/var/www/imagesizator/manage.py
-      - ../dockerfiles/production-web-dockerfile/conf/django/pytest.ini:/var/www/imagesizator/pytest.ini
-      - ../dockerfiles/production-web-dockerfile/conf/django/asgi.py:/var/www/imagesizator/imagesizator/asgi.py
-      - ../dockerfiles/production-web-dockerfile/conf/django/wsgi.py:/var/www/imagesizator/imagesizator/wsgi.py
-      # Mapping database
-      - ../../db.sqlite3:/var/www/imagesizator/db.sqlite3
     restart: unless-stopped
     ports:
       - "80:80"
