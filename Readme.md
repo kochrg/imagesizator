@@ -1,9 +1,51 @@
 # Imagesizator
 Imagesizator can receive an image through an HTTP or HTTPS endpoint, manipulate it, and send you the result.
 
-## First Steps
-1. On root folder rename the file ``settings.sample-env`` to ``.env`` and change the ``SECRET_KEY=`` value.
-2. Go to *docker/dockerfiles/production-web-dockerfile/conf/ssl* and run: ``./create-certificates.sh``.
+## First steps
+If you want to try or test the project, you can run in a **dev mode** with Django manage.py runserver option:
+1. Go to the project root folder.
+2. Create a virtual environment for the project (recommended):
+```
+# Config project env
+apt install python3.9 python3.9-dev python3.9-distutils python3-pip python3.9-venv -y
+pip3 install virtualenv
+pip3 install virtualenvwrapper
+
+python3 -m venv /usr/share/.virtualenvs/imagesizator
+echo "export PYTHONPATH='/usr/bin/python3.9'" >> /usr/share/.virtualenvs/imagesizator/bin/activate
+workon imagesizator
+pip3 install -r requirements.txt
+
+# start the server
+python manage.py runserver
+```
+
+### Configuring apache (deploy with docker):
+
+1. Create a copy of *docker/dockerfiles/production-web-dockerfile/conf/imagesizator-sample.conf* inside the same folder with the name *imagesizator.conf*.
+2. Customize the file with your own email, ServerName, ServerAlias and domain.
+3. Using SSL:
+
+**Creating self-signed certificates:**
+If you want to use your self-signed certificates follow the next steps:
+1. Go to *docker/dockerfiles/production-web-dockerfile/conf/ssl* and run: ``sh ./create-certificates.sh`` as non-root user.
+2. The command will create two files inside *./server-certificates* folder: ``server.key`` and ``server.crt``. Both files are used to encrypt the connection.
+3. You don't need to change anything in ``imagesizator.conf`` file.
+
+*NOTE: there is no certificate authority (CA) file so, in some web browsers and tools you need to add an exception for the created certificate to use it or, in other cases search for ``disable SSL Verification`` (i.e.: Postman).*
+
+**Using certificates of an official CA:**
+1. Copy the key, certificate and chain (certificate + CA certificate) inside *docker/dockerfiles/production-web-dockerfile/conf/ssl/server-certificates* folder.
+2. In ``imagesizator.conf`` file, point apache to use your certificates:
+```
+    SSLCertificateFile /etc/apache2/ssl/your_server.crt
+    
+    SSLCertificateKeyFile /etc/apache2/ssl/your_server.key
+    
+    SSLCertificateChainFile /etc/apache2/ssl/your_chain.pem
+```
+
+*NOTE: only change **the name of the file**, not the path, it is relative to docker configuration.*
 
 ### How to get the *image_as_string* in Python:
 ```
@@ -39,7 +81,8 @@ To run a command from Terminal:
     "action": "resize",
     "to_width": "your_width",
     "to_height": "your_height",
-    "image": "image_as_string" 
+    "suffix": "the_file_extension",
+    "image": "image_as_string",
 }
 ```
 
@@ -58,6 +101,7 @@ To run a command from Terminal:
     "action": "resize",
     "to_width": "your_width",
     "to_height": "your_height",
+    "suffix": "the_file_extension",
     "image": "image_as_string" 
 }
 ```
