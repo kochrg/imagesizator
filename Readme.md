@@ -5,7 +5,7 @@ Imagesizator can receive an image through an HTTP or HTTPS endpoint, manipulate 
 If you want to try or test the project, you can run in a **dev mode** with Django manage.py runserver option:
 1. Go to the project root folder.
 2. Create a virtual environment for the project (recommended):
-```
+```shell
 # Config project env
 apt install python3.9 python3.9-dev python3.9-distutils python3-pip python3.9-venv -y
 pip3 install virtualenv
@@ -76,7 +76,7 @@ To run a command from Terminal:
 - ``Content-Type: application/json``
 
 **Data:**
-```
+```json
 {
     "action": "resize",
     "to_width": "your_width",
@@ -96,7 +96,7 @@ To run a command from Terminal:
 - ``Content-Type: application/json``
 
 **Data:**
-```
+```json
 {
     "action": "resize",
     "to_width": "your_width",
