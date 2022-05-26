@@ -48,7 +48,7 @@ If you want to use your self-signed certificates follow the next steps:
 *NOTE: only change **the name of the file**, not the path, it is relative to docker configuration.*
 
 ### How to get the *image_as_string* in Python:
-```
+```python
 with open(path_to_the_image, "rb") as image_file:
     image_as_string = base64.b64encode(image_file.read()).decode("utf8")  # -> bytes_string
     # Then use image_as_string in data
@@ -67,6 +67,8 @@ To run a command from Terminal:
 # Endpoints
 
 ## Resizing with Pillow (PIL) - *recommended*
+Slightly faster than opencv.
+
 **Endpoint URI:** ``/images/pillow``
 
 **Method:** POST
