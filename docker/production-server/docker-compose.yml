@@ -1,0 +1,16 @@
+version: "3.9"
+
+services:
+  web-server:
+    container_name: imagesizator-container
+    build:
+      context: ../../
+      dockerfile: ./docker/dockerfiles/production-web-dockerfile/Dockerfile
+    command: bash -c "pip install -r requirements.txt
+            && python3 manage.py migrate --noinput
+            && python3 manage.py initadmin
+            && apachectl -D FOREGROUND"
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
