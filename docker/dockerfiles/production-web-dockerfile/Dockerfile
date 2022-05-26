@@ -26,9 +26,6 @@ RUN apt-get install -y openssl
 # Installing certificates
 COPY ./docker/dockerfiles/production-web-dockerfile/conf/ssl/server-certificates/* /etc/apache2/ssl/
 
-# Adding MinTLSV1 compatibility
-# COPY ./docker/dockerfiles/production-web-dockerfile/conf/openssl.cnf /etc/ssl/
-
 # Config project env
 RUN apt install python3.9 python3.9-dev python3.9-distutils python3-pip python3.9-venv -y
 RUN pip3 install virtualenv
@@ -37,9 +34,8 @@ RUN pip3 install virtualenvwrapper
 # Install mod_wsgi
 RUN apt install apache2-utils ssl-cert libapache2-mod-wsgi-py3 -y
 
-# Copy code: from project-root to www/imagesizator, this is only to build
-# the container, when this Dockerfile is used in a docker-compose file
-# and the volumes are mapped, the files are overwritten
+# Copy code: from project-root to www/imagesizator, if you make changes in a file
+# call to docker-compose build
 COPY . /var/www/imagesizator/
 COPY ./docker/dockerfiles/production-web-dockerfile/conf/django/manage.py /var/www/imagesizator/manage.py
 COPY ./docker/dockerfiles/production-web-dockerfile/conf/django/pytest.ini /var/www/imagesizator/pytest.ini
@@ -52,6 +48,18 @@ RUN echo "export PYTHONPATH='/usr/bin/python3.9'" >> /usr/share/.virtualenvs/ima
 RUN /usr/share/.virtualenvs/imagesizator/bin/pip3 install -r requirements.txt
 RUN pip3 install -r requirements.txt
 RUN chmod 777 -R /usr/share/.virtualenvs
+
+# Creating database and applying migrations
+RUN /usr/share/.virtualenvs/imagesizator/bin/python manage.py migrate
+
+# Creating superuser
+RUN /usr/share/.virtualenvs/imagesizator/bin/python manage.py initadmin
+
+# Adding staticfiles
+RUN /usr/share/.virtualenvs/imagesizator/bin/python manage.py collectstatic --no-input
+
+# Change folder owner
+RUN chown -R www-data:www-data /var/www/imagesizator
 
 # Adding apache host
 COPY ./docker/dockerfiles/production-web-dockerfile/conf/imagesizator.conf /etc/apache2/sites-available/imagesizator.conf
