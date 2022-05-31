@@ -1,6 +1,14 @@
 # Imagesizator
 Imagesizator can receive an image through an HTTP or HTTPS endpoint, manipulate it, and send you the result.
 
+## Prerequisites
+1. Install docker:
+```shell
+sudo apt update && sudo apt install docker.io
+```
+2. Install docker-compose following [this link](https://docs.docker.com/compose/install/).
+*NOTE: if you don't know which option follow to install, the **Linux Standalone Binary** option is recommended.*
+
 ## First steps
 If you want to try or test the project, you can run in a **dev mode** with Django manage.py runserver option:
 1. Go to the project root folder.
