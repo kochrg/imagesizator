@@ -1,19 +1,8 @@
-**For dev server:**
-- Go to *server-dev* folder
+**Running server:**
+- Go to *production-server* folder
 - Execute ``docker-compose up``
-
-**For staging server:**
-- Go to *server-staging* folder
-- Execute ``docker-compose up``
-
-**NOTE:**
-If ERROR ``'can't stat 'some-url/imagesizator/docker/dockerfiles/postgresql/data''`` appears when
-execute ``docker-compose up`` then open a terminal and go to *docker* folder.
-
-SOLUTION:
-
-1) Run ``sudo chmod 777 -R ./dockerfiles/postgresql/data``
-
-2) Run ``docker-compose up``
-
-If you want to run the containers in background run ``docker-compose up -d``.
+  *NOTE: If you want to run the container in background run ``docker-compose up -d``.*
+- If you make changes in code or in config files of the docker container, a rebuild is needed:
+  1. Stop the running containers: ``docker-compose down``.
+  2. Run ``docker-compose build`` to rebuild the image.
+  3. ``docker-compose up -d`` to start the server again.
