@@ -24,7 +24,8 @@ python manage.py runserver
 
 1. Create a copy of *docker/dockerfiles/production-web-dockerfile/conf/imagesizator-sample.conf* inside the same folder with the name *imagesizator.conf*.
 2. Customize the file with your own email, ServerName, ServerAlias and domain.
-3. Using SSL:
+3. By default, server **listen in port 80 and 443**. If you want only one, modify the *imagesizator.conf* file created in **step 1**.
+4. Using SSL:
 
 **Creating self-signed certificates:**
 If you want to use your self-signed certificates follow the next steps:
