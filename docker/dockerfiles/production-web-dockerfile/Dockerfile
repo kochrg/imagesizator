@@ -46,7 +46,6 @@ COPY ./docker/dockerfiles/production-web-dockerfile/conf/django/wsgi.py /var/www
 RUN python3 -m venv /usr/share/.virtualenvs/imagesizator
 RUN echo "export PYTHONPATH='/usr/bin/python3.9'" >> /usr/share/.virtualenvs/imagesizator/bin/activate
 RUN /usr/share/.virtualenvs/imagesizator/bin/pip3 install -r requirements.txt
-RUN pip3 install -r requirements.txt
 RUN chmod 777 -R /usr/share/.virtualenvs
 
 # Creating database and applying migrations
@@ -54,6 +53,9 @@ RUN /usr/share/.virtualenvs/imagesizator/bin/python manage.py migrate
 
 # Creating superuser
 RUN /usr/share/.virtualenvs/imagesizator/bin/python manage.py initadmin
+
+# Setting opentelemetry
+RUN /usr/share/.virtualenvs/imagesizator/bin/opentelemetry-bootstrap --action=install
 
 # Adding staticfiles
 RUN /usr/share/.virtualenvs/imagesizator/bin/python manage.py collectstatic --no-input

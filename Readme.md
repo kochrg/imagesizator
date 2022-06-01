@@ -74,6 +74,19 @@ To run a command from Terminal:
 2. Go to project root folder.
 3. Run: ``python manage.py name_of_the_command``
 
+### Monitoring with SigNoz (optional)
+
+Imagesizator is compatible with OpenTelemetry Django instrumentation that enables generation of telemetry data from a Django application. The data is then used to monitor performance of a Django application with a monitoring tool like Datadog, New Relic or SigNoz (an open-source monitoring tool).
+
+By default, Imagesizator install all the requirements needed to use [SigNoz](https://signoz.io/docs/) when running the application from the Docker container as a production server.
+
+More info about SigNoz and Django:
+- [Install SigNoz with Docker](https://signoz.io/docs/install/docker)
+- [Monitoring a Django app with SigNoz](https://signoz.io/blog/opentelemetry-django/)
+
+**Configuring Imagesizator with SigNoz**
+
+
 # Endpoints
 
 ## Resizing with Pillow (PIL) - *recommended*
