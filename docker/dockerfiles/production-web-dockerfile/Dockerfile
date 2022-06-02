@@ -40,7 +40,8 @@ COPY . /var/www/imagesizator/
 COPY ./docker/dockerfiles/production-web-dockerfile/conf/django/manage.py /var/www/imagesizator/manage.py
 COPY ./docker/dockerfiles/production-web-dockerfile/conf/django/pytest.ini /var/www/imagesizator/pytest.ini
 COPY ./docker/dockerfiles/production-web-dockerfile/conf/django/asgi.py /var/www/imagesizator/imagesizator/asgi.py
-COPY ./docker/dockerfiles/production-web-dockerfile/conf/django/wsgi.py /var/www/imagesizator/imagesizator/wsgi.py
+COPY ./docker/dockerfiles/production-web-dockerfile/conf/django/wsgi.py \
+     ./docker/dockerfiles/production-web-dockerfile/conf/django/signoz.config* /var/www/imagesizator/imagesizator/
 
 # Creating venv
 RUN python3 -m venv /usr/share/.virtualenvs/imagesizator

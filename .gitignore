@@ -2,6 +2,8 @@ __pycache__/
 db.sqlite3
 *.env
 
+signoz.config.py
+
 docker/dockerfiles/production-web-dockerfile/conf/ssl/server-certificates/*
 docker/dockerfiles/production-web-dockerfile/conf/imagesizator.conf
 
