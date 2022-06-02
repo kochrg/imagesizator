@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/3.2/howto/deployment/wsgi/
 import os
 
 from opentelemetry import trace
-from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter  # noqa
 from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
@@ -19,7 +19,7 @@ from opentelemetry.instrumentation.wsgi import OpenTelemetryMiddleware
 from django.core.wsgi import get_wsgi_application
 
 try:
-    import imagesizator.signoz_config as signoz 
+    import imagesizator.signoz_config as signoz
 except ImportError as error:
     print(error)
 
@@ -40,12 +40,16 @@ if signoz.ENABLE:
 
     span_processor = BatchSpanProcessor(
         OTLPSpanExporter(
-            endpoint=signoz.OTEL_EXPORTER_OTLP_ENDPOINT, 
+            endpoint=signoz.OTEL_EXPORTER_OTLP_ENDPOINT,
             insecure=signoz.INSECURE_ENDPOINT
         )
     )
 
     trace.get_tracer_provider().add_span_processor(span_processor)
 
-    application = OpenTelemetryMiddleware(application, None, None, trace.get_tracer_provider())
-    
+    application = OpenTelemetryMiddleware(
+        application,
+        None,
+        None,
+        trace.get_tracer_provider()
+    )

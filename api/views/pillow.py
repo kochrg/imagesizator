@@ -1,7 +1,4 @@
-from fileinput import filename
-from tempfile import TemporaryFile, NamedTemporaryFile
-from django.contrib.auth import get_user_model
-from django.views.decorators.csrf import csrf_exempt
+from tempfile import NamedTemporaryFile
 from django.http import JsonResponse
 from django.core.files.base import ContentFile
 from rest_framework.generics import RetrieveAPIView
@@ -26,21 +23,27 @@ class PILImageResize(RetrieveAPIView):
             to_width = int(request.data["to_width"])
             to_height = int(request.data["to_height"])
             suffix = request.data["suffix"]
-            
+
             # bytes image in format: base64.b64encode(image).decode('utf8')
             image = base64.b64decode(request.data["image"])
 
-            image_thumbnail = Image.open(ContentFile(image, "temp_image" + suffix))
+            image_thumbnail = Image.open(
+                ContentFile(image, "temp_image" + suffix)
+            )
             image_thumbnail.thumbnail((to_width, to_height))
-            
+
             # Saving resized image to a temporal file
-            # NOTE: must be used image_thumbnail.save() as the function used for save the image,
-            # other saving methods didn't work (fails when saving).
-            # Use image_thumbnail.tobytes() to avoid save the file (using memory buffer) fails too.
+            # NOTE: must be used image_thumbnail.save() as the function used
+            # for save the image, other saving methods didn't work (fails when saving).
+            # Use image_thumbnail.tobytes() to avoid save the file
+            # (using memory buffer) fails too.
             # TODO: check if there is a faster way.
-            with NamedTemporaryFile("r+b", prefix='pil_resized_', suffix=suffix) as resized_image_file:
+            with NamedTemporaryFile(
+                "r+b", prefix='pil_resized_',
+                suffix=suffix
+            ) as resized_image_file:
                 image_thumbnail.save(resized_image_file.name)
-            
+
                 img_bytes = resized_image_file.read()
                 string_image = base64.b64encode(img_bytes).decode('utf8')
 
