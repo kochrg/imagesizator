@@ -78,14 +78,21 @@ To run a command from Terminal:
 
 Imagesizator is compatible with OpenTelemetry Django instrumentation that enables generation of telemetry data from a Django application. The data is then used to monitor performance of a Django application with a monitoring tool like Datadog, New Relic or SigNoz (an open-source monitoring tool).
 
-By default, Imagesizator install all the requirements needed to use [SigNoz](https://signoz.io/docs/) when running the application from the Docker container as a production server.
+By default, Imagesizator install all the requirements needed to use [SigNoz](https://signoz.io/docs/) when running the application from the Docker container as a production server but you need to enable to send the data to your SigNoz server to get it working.
+
+**About SigNoz**
+*"SigNoz is an open-source APM. It helps developers monitor their applications & troubleshoot problems, an open-source alternative to DataDog, NewRelic, etc. fire desktop_computer. point_right Open source Application Performance Monitoring (APM) & Observability tool"* [Github repository](https://github.com/SigNoz/signoz)
 
 More info about SigNoz and Django:
 - [Install SigNoz with Docker](https://signoz.io/docs/install/docker)
 - [Monitoring a Django app with SigNoz](https://signoz.io/blog/opentelemetry-django/)
 
 **Configuring Imagesizator with SigNoz**
+1. Go to *docker/dockerfiles/production-web-dockerfile/conf/django/*
+2. Create a duplicate of ``signoz_config_sample.py`` in the same folder with the name ``signoz_config.py``
+3. Add your custom parameters in the file following the comments.
 
+*Remember: if the docker container exists (was created before), you need to stop it, delete the process and run ``docker-compose build && docker-compose up -d`` to see the new changes.*
 
 # Endpoints
 
