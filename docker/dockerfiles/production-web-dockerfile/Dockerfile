@@ -40,13 +40,16 @@ COPY . /var/www/imagesizator/
 COPY ./docker/dockerfiles/production-web-dockerfile/conf/django/manage.py /var/www/imagesizator/manage.py
 COPY ./docker/dockerfiles/production-web-dockerfile/conf/django/pytest.ini /var/www/imagesizator/pytest.ini
 COPY ./docker/dockerfiles/production-web-dockerfile/conf/django/asgi.py /var/www/imagesizator/imagesizator/asgi.py
-COPY ./docker/dockerfiles/production-web-dockerfile/conf/django/wsgi.py /var/www/imagesizator/imagesizator/wsgi.py
+
+# Copy files for apache deploy working with SigNoz monitoring tool.
+# Files signoz.config* are added to imagesizator folder only if they exists. 
+COPY ./docker/dockerfiles/production-web-dockerfile/conf/django/wsgi.py \
+     ./docker/dockerfiles/production-web-dockerfile/conf/django/signoz_config* /var/www/imagesizator/imagesizator/
 
 # Creating venv
 RUN python3 -m venv /usr/share/.virtualenvs/imagesizator
 RUN echo "export PYTHONPATH='/usr/bin/python3.9'" >> /usr/share/.virtualenvs/imagesizator/bin/activate
 RUN /usr/share/.virtualenvs/imagesizator/bin/pip3 install -r requirements.txt
-RUN pip3 install -r requirements.txt
 RUN chmod 777 -R /usr/share/.virtualenvs
 
 # Creating database and applying migrations
@@ -54,6 +57,9 @@ RUN /usr/share/.virtualenvs/imagesizator/bin/python manage.py migrate
 
 # Creating superuser
 RUN /usr/share/.virtualenvs/imagesizator/bin/python manage.py initadmin
+
+# Setting opentelemetry
+RUN /usr/share/.virtualenvs/imagesizator/bin/opentelemetry-bootstrap --action=install
 
 # Adding staticfiles
 RUN /usr/share/.virtualenvs/imagesizator/bin/python manage.py collectstatic --no-input

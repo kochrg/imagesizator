@@ -9,7 +9,9 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         try:
-            image_path = input("Enter the PATH and name where to save the image: ")
+            image_path = input(
+                "Enter the PATH and name where to save the image: "
+            )
             string_image_path = input("Enter path to image string: ")
 
             with open(string_image_path, "r") as string_image:

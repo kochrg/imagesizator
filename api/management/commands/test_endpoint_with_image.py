@@ -1,10 +1,10 @@
-from email import header
 from django.core.management.base import BaseCommand
 
 import base64
 import json
 import requests
 import time
+
 
 # Test endpoint with an image stored in local disk.
 # Useful to test with big images.
@@ -19,7 +19,7 @@ class Command(BaseCommand):
             to_width = input("Enter the final width: ")
             to_height = input("Enter the final height: ")
             suffix = input("Enter the image suffix: ")
-            
+
             with open(image_path, "rb") as image_file:
                 image = base64.b64encode(image_file.read()).decode("utf8")  # -> bytes_string
                 data = {

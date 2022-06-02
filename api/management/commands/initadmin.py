@@ -28,6 +28,6 @@ class Command(BaseCommand):
                 # Default admin password, WARNING!!
                 print(f"{bcolors.WARNING}WARNING!! You have the default admin password!!{bcolors.ENDC}")
                 print(
-                    f"{bcolors.WARNING}Change it from Django admin. " 
+                    f"{bcolors.WARNING}Change it from Django admin. "
                     + f"View the Readme.md file for more details.{bcolors.ENDC}"
                 )
