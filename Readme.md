@@ -11,7 +11,7 @@ sudo apt update && sudo apt install docker.io
 *NOTE: if you don't know which option follow to install, the **Linux Standalone Binary** option is recommended.*
 
 ## First steps
-If you want to try or test the project, you can run in a **dev mode** with Django manage.py runserver option:
+If you want to try or test the project, you can run in a **dev mode** with Django ``manage.py runserver`` option:
 1. Go to the project root folder.
 2. Create a virtual environment for the project (recommended):
 ```shell
