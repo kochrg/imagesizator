@@ -25,6 +25,9 @@ echo "export PYTHONPATH='/usr/bin/python3.9'" >> /usr/share/.virtualenvs/imagesi
 workon imagesizator
 pip3 install -r requirements.txt
 
+# Initialize
+python manage.py initadmin
+
 # start the server
 python manage.py runserver
 ```
@@ -88,11 +91,42 @@ More info about SigNoz and Django:
 - [Monitoring a Django app with SigNoz](https://signoz.io/blog/opentelemetry-django/)
 
 **Configuring Imagesizator with SigNoz**
-1. Go to *docker/dockerfiles/production-web-dockerfile/conf/django/*
-2. Create a duplicate of ``signoz_config_sample.py`` in the same folder with the name ``signoz_config.py``
-3. Add your custom parameters in the file following the comments.
+1. Go to Django admin page: *your_imagesizator_url/admin*
+2. Login
+3. Go to ``Parameters`` and modify otlp parameters:
+- ``enable_otlp``: set yo *yes* to enable or *no* to disable.
+- ``otlp_resource_attributes``: choose the name that you want. By default *imagesizator-service*.
+- ``otlp_endpoint_url``: the *remote service url*. I.e.: your SigNoz server:port.
+- ``otlp_insecure_endpoint``: set to *no* if your remote service use SSL, *yes* to disable.
 
 *Remember: if the docker container exists (was created before), you need to stop it, delete the process and run ``docker-compose build && docker-compose up -d`` to see the new changes.*
+
+## About the database
+Imagesizator uses a **sqlite3** database that is initialized when the server runs for the first time. It is stored inside the database folder in the root of the project directory.
+
+**IMPORTANT NOTE:** if you havve problems running the container or experiment a *Server error (500)** when trying to access to Django admin, the cause could be the permissions of the ``database/db.sqlite3`` file related to the user that creates the database when the container is created.
+One way to solve this is deleting the ``db.sqlite3``, start your *venv* and run:
+
+```shell
+python manage.py initadmin
+
+# And then run the container
+cd docker
+docker-compose up -d
+```
+
+It will create the database file using the current user.
+
+If it didn't work you can try to add read and write permissions to the file:
+```shell
+# Generally, from project root folder
+chmod 755 ./database/db.sqlite3
+```
+
+If you still have problems run the following command. **NOTE:** this is insecure because you give to all users permissions to write and read the database. Run this by your own risk:
+```shell
+chmod 755 ./database/db.sqlite3
+```
 
 # Endpoints
 
