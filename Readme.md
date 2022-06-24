@@ -104,8 +104,8 @@ More info about SigNoz and Django:
 ## About the database
 Imagesizator uses a **sqlite3** database that is initialized when the server runs for the first time. It is stored inside the database folder in the root of the project directory.
 
-**IMPORTANT NOTE:** if you havve problems running the container or experiment a *Server error (500)** when trying to access to Django admin, the cause could be the permissions of the ``database/db.sqlite3`` file related to the user that creates the database when the container is created.
-One way to solve this is deleting the ``db.sqlite3``, start your *venv* and run:
+**IMPORTANT NOTE:** if you have problems running the container or experiment a *Server error (500)** when trying to access to Django admin, the cause could be the permissions of the ``database/db.sqlite3`` file, and it is related to the user that creates the database when the container is created.
+One way to solve this is deleting the ``db.sqlite3`` file, start your *venv* and run:
 
 ```shell
 python manage.py initadmin
@@ -125,7 +125,7 @@ chmod 755 ./database/db.sqlite3
 
 If you still have problems run the following command. **NOTE:** this is insecure because you give to all users permissions to write and read the database. Run this by your own risk:
 ```shell
-chmod 755 ./database/db.sqlite3
+chmod 777 ./database/db.sqlite3
 ```
 
 # Endpoints
