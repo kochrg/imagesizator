@@ -41,10 +41,10 @@ COPY ./docker/dockerfiles/production-web-dockerfile/conf/django/manage.py /var/w
 COPY ./docker/dockerfiles/production-web-dockerfile/conf/django/pytest.ini /var/www/imagesizator/pytest.ini
 COPY ./docker/dockerfiles/production-web-dockerfile/conf/django/asgi.py /var/www/imagesizator/imagesizator/asgi.py
 
-# Copy files for apache deploy working with SigNoz monitoring tool.
-# Files signoz.config* are added to imagesizator folder only if they exists. 
+# Copy files for apache deploy working with SigNoz or Open Telemetry monitoring tools.
+# Files otlp_config* are added to imagesizator folder only if they exists. 
 COPY ./docker/dockerfiles/production-web-dockerfile/conf/django/wsgi.py \
-     ./docker/dockerfiles/production-web-dockerfile/conf/django/signoz_config* /var/www/imagesizator/imagesizator/
+     ./docker/dockerfiles/production-web-dockerfile/conf/django/otlp_config* /var/www/imagesizator/imagesizator/
 
 # Creating venv
 RUN python3 -m venv /usr/share/.virtualenvs/imagesizator

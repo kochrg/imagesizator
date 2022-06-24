@@ -13,8 +13,8 @@ def create_auth_token(sender, instance=None, created=False, **kwargs):
         Token.objects.create(user=instance)
 
 
-# --------------------------------------------------------------------
-# -------------------- CUSTOM MODELS ---------------------------------
+# -------------------------------------------------------------------
+# ------------------------- CUSTOM MODELS ---------------------------
 # -------------------------------------------------------------------
 class Parameters(models.Model):
     created_at = models.DateTimeField(

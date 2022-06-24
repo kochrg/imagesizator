@@ -18,30 +18,28 @@ from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from opentelemetry.instrumentation.wsgi import OpenTelemetryMiddleware
 from django.core.wsgi import get_wsgi_application
 
-try:
-    import imagesizator.signoz_config as signoz
-except ImportError as error:
-    print(error)
-
-    # Default values
-    import imagesizator.signoz_config_sample as signoz
-
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'imagesizator.settings_prod')
 
 application = get_wsgi_application()
 
-if signoz.ENABLE:
+try:
+    import imagesizator.otlp_config as otlp
+except ImportError as error:
+    print(error)
+
+# Enable Open Telemetry?
+if otlp.ENABLE:
     resource = Resource.create(attributes={
-        "service.name": signoz.OTEL_RESOURCE_ATTRIBUTES
+        "service.name": otlp.OTEL_RESOURCE_ATTRIBUTES
     })
 
     trace.set_tracer_provider(TracerProvider(resource=resource))
 
     span_processor = BatchSpanProcessor(
         OTLPSpanExporter(
-            endpoint=signoz.OTEL_EXPORTER_OTLP_ENDPOINT,
-            insecure=signoz.INSECURE_ENDPOINT
+            endpoint=otlp.OTEL_EXPORTER_OTLP_ENDPOINT,
+            insecure=otlp.INSECURE_ENDPOINT
         )
     )
 
