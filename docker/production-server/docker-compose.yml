@@ -11,6 +11,8 @@ services:
             && python3 manage.py initadmin
             && apachectl -D FOREGROUND"
     restart: unless-stopped
+    volumes:
+      - ../../database:/var/www/imagesizator/database
     ports:
       - "80:80"
       - "443:443"
