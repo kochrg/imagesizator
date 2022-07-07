@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model, authenticate
 from django.core.management.base import BaseCommand
-from utils.bcolors import bcolors
+from api.common.utils.bcolors import bcolors
 from api.models import Parameters
 
 User = get_user_model()
