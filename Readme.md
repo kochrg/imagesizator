@@ -99,7 +99,7 @@ More info about SigNoz and Django:
 - ``otlp_endpoint_url``: the *remote service url*. I.e.: your SigNoz server:port.
 - ``otlp_insecure_endpoint``: set to *no* if your remote service use SSL, *yes* to disable.
 
-*Remember: if the docker container exists (was created before), you need to stop it, delete the process and run ``docker-compose build && docker-compose up -d`` to see the new changes.*
+*Remember: if the docker container exists (was created before), you need to stop it, delete the process and run ``docker-compose up -d`` to see the new changes.*
 
 ## About the database
 Imagesizator uses a **sqlite3** database that is initialized when the server runs for the first time. It is stored inside the database folder in the root of the project directory.
@@ -126,6 +126,16 @@ chmod 755 ./database/db.sqlite3
 If you still have problems run the following command. **NOTE:** this is insecure because you give to all users permissions to write and read the database. Run this by your own risk:
 ```shell
 chmod 777 ./database/db.sqlite3
+```
+
+# Building and running the container
+1. Inside *docker/production-server* folder, run:
+```shell
+docker-compose build --build-arg HOST_WWW_DATA_GID=$(id www-data -g) --build-arg HOST_USER_GID=$(id -g) --build-arg HOST_USER_GNAME=$(getent group $(id -g) | cut -d: -f1)
+```
+2. Run:
+```
+docker-compose up -d
 ```
 
 # Endpoints

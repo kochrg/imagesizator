@@ -1,3 +1,4 @@
+import os
 from api.models import Parameters
 
 
@@ -17,3 +18,15 @@ def diff_month(d1, d2):
     if d1 == d2:
         return 0
     return (d1.year - d2.year) * 12 + d1.month - d2.month
+
+
+def get_temp_path():
+    path = os.getcwd()
+    path += "/public/temp/"
+    return path
+
+
+def get_static_path():
+    path = os.getcwd()
+    path += "/public/static/"
+    return path

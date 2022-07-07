@@ -3,6 +3,10 @@
 # NOTE: build-context = project-root folder
 
 FROM ubuntu:21.04
+ARG HOST_WWW_DATA_GID
+ARG HOST_USER_GID
+ARG HOST_USER_GNAME
+
 WORKDIR /var/www/imagesizator/
 
 ENV TZ=America/Argentina
@@ -64,8 +68,10 @@ RUN /usr/share/.virtualenvs/imagesizator/bin/opentelemetry-bootstrap --action=in
 # Adding staticfiles
 RUN /usr/share/.virtualenvs/imagesizator/bin/python manage.py collectstatic --no-input
 
-# Change folder owner
-RUN chown -R www-data:www-data /var/www/imagesizator
+# Change folder owner and volume mapping permissions
+RUN sh ./docker/dockerfiles/production-web-dockerfile/init.sh ${HOST_WWW_DATA_GID}
+RUN groupadd -g ${HOST_USER_GID} ${HOST_USER_GNAME}
+RUN adduser www-data ${HOST_USER_GNAME}
 
 # Adding apache host
 COPY ./docker/dockerfiles/production-web-dockerfile/conf/imagesizator.conf /etc/apache2/sites-available/imagesizator.conf
