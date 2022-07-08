@@ -131,7 +131,7 @@ chmod 777 ./database/db.sqlite3
 # Building and running the container
 1. Inside *docker/production-server* folder, run:
 ```shell
-docker-compose build --build-arg HOST_WWW_DATA_GID=$(id www-data -g) --build-arg HOST_USER_GID=$(id -g) --build-arg HOST_USER_GNAME=$(getent group $(id -g) | cut -d: -f1)
+docker-compose build --build-arg HOST_WWW_DATA_GID=$(id www-data -g) --build-arg HOST_USER_GID=$(id -g) --build-arg HOST_USER_GNAME=$(getent group $(id -g) | cut -d: -f1) [--build-arg HT_USER=username --build-arg HT_PASSWD=password](optional)
 ```
 2. Run:
 ```
