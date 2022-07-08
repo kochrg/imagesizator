@@ -1,8 +1,10 @@
+from stat import S_IRWXG, S_IRWXU
 from tempfile import NamedTemporaryFile
 from django.http import JsonResponse
 from rest_framework.generics import RetrieveAPIView
 from rest_framework import permissions
 
+import os
 import base64
 import cv2
 
@@ -81,6 +83,7 @@ class OpenCVImageResize(RetrieveAPIView):
                         }
                         response_code = 200
 
+                        os.chmod(resized_image_file.name, S_IRWXU + S_IRWXG)
                         resized_image_file.close()
                         f.close()
                 else:
