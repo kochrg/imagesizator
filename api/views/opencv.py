@@ -1,4 +1,3 @@
-from stat import S_IRWXG, S_IRWXU
 from tempfile import NamedTemporaryFile
 from django.http import JsonResponse
 from rest_framework.generics import RetrieveAPIView
@@ -81,8 +80,6 @@ class OpenCVImageResize(RetrieveAPIView):
                     response_code = 200
         except Exception as e:
             print(e)
-            response_data = {'error': e}
-            response_code = 500
 
         # TODO: check if it is possible to close (and then delete) files asynchonously
         resized_image_file.close()

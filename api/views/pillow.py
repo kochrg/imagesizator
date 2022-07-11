@@ -1,4 +1,3 @@
-from tempfile import NamedTemporaryFile
 from django.http import JsonResponse
 from django.core.files.base import ContentFile
 from rest_framework.generics import RetrieveAPIView
@@ -80,8 +79,6 @@ class PILImageResize(RetrieveAPIView):
                 response_code = 200
         except Exception as e:
             print(e)
-            response_data = {'error': e}
-            response_code = 500
 
         resized_image_file.close()
         return JsonResponse(response_data, status=response_code)

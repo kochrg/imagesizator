@@ -16,4 +16,10 @@ urlpatterns = [
         api.PILImageResize.as_view(),
         name="pillow-image-resize"
     ),
+    # PDF
+    path(
+        "images/pdf/publish",
+        api.PublishPDFFile.as_view(),
+        name="publish-pdf-file"
+    ),
 ]
