@@ -13,6 +13,24 @@ def get_parameter_value(key):
     return False
 
 
+def add_parameter_if_not_exists(key, value):
+    """
+    Add a parameter if it not exists in database.
+    """
+    parameter = get_parameter_value(key)
+
+    if parameter is not None:
+        if not parameter:
+            print("Añadiendo el parámetro:", key)
+            Parameters(
+                key=key,
+                value=value
+            ).save()
+            return True
+
+    return False
+
+
 def diff_month(d1, d2):
     # Get months between two dates. D2 <= D1
     if d1 == d2:

@@ -83,6 +83,7 @@ class OpenCVImageResize(RetrieveAPIView):
                         }
                         response_code = 200
 
+                        # chmod 770 (Grant rwx access to www-data.www-data 'user.group')
                         os.chmod(resized_image_file.name, S_IRWXU + S_IRWXG)
                         resized_image_file.close()
                         f.close()
