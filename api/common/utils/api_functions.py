@@ -1,4 +1,6 @@
 import os
+from stat import S_IRWXG, S_IRWXU
+from tempfile import NamedTemporaryFile
 from api.models import Parameters
 
 
@@ -38,13 +40,30 @@ def diff_month(d1, d2):
     return (d1.year - d2.year) * 12 + d1.month - d2.month
 
 
-def get_temp_path():
-    path = os.getcwd()
-    path += "/public/temp/"
+def get_publish_file_path(temporal):
+    path = "/public/temp/"
+    if not temporal:
+        path = "/public/static/"
     return path
 
 
-def get_static_path():
-    path = os.getcwd()
-    path += "/public/static/"
-    return path
+def get_named_temporary_file(prefix, suffix, publish=False, temporal=True):
+    if publish:
+        # Return image public url
+        publish_path = os.getcwd() + get_publish_file_path(temporal)
+
+        temporary_file = NamedTemporaryFile(
+            "r+b",
+            prefix=prefix,
+            suffix=suffix,
+            dir=publish_path,
+            delete=False
+        )
+
+        # chmod 770 (Grant rwx access to www-data.www-data 'user and group')
+        os.chmod(temporary_file.name, S_IRWXU + S_IRWXG)
+        return temporary_file
+    else:
+        temporary_file = NamedTemporaryFile("r+b", prefix=prefix, suffix=suffix)
+
+        return temporary_file

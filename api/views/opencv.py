@@ -4,11 +4,10 @@ from django.http import JsonResponse
 from rest_framework.generics import RetrieveAPIView
 from rest_framework import permissions
 
-import os
 import base64
 import cv2
 
-from api.common.utils.api_functions import get_parameter_value, get_static_path, get_temp_path
+from api.common.utils.api_functions import get_named_temporary_file, get_parameter_value, get_publish_file_path
 
 
 # User must be logged to use this endpoint.
@@ -50,65 +49,40 @@ class OpenCVImageResize(RetrieveAPIView):
                 # other saving methods didn't work (fails when trying to save the image).
                 # Use processed_image.tobytes() to avoid save the file (using memory buffer) fails too.
                 # TODO: check if there is a faster way.
+                
+                resized_image_file = get_named_temporary_file('ocv_resized_', suffix, publish, temporal)
+                cv2.imwrite(resized_image_file.name, processed_image)
+                
                 if publish:
-                    # Return image public url
-                    publish_path = ''
-                    publish_url = ''
-                    if temporal:
-                        publish_path = get_temp_path()
-                        publish_url = '/public/temp/'
-                    else:
-                        # static file
-                        publish_path = get_static_path()
-                        publish_url = '/public/static/'
+                    publish_url = get_publish_file_path(temporal)
+                    image_url = get_parameter_value('imagesizator_domain')
+                    image_url += publish_url + resized_image_file.name.split('/')[-1]
 
-                    with NamedTemporaryFile(
-                        "r+b",
-                        prefix='ocv_resized_',
-                        suffix=suffix,
-                        dir=publish_path,
-                        delete=False
-                    ) as resized_image_file:
-                        cv2.imwrite(resized_image_file.name, processed_image)
-
-                        image_url = get_parameter_value('imagesizator_domain')
-                        image_url += publish_url + resized_image_file.name.split('/')[-1]
-
-                        response_data = {
-                            'status': 'resized',
-                            'width': to_width,
-                            'height': to_height,
-                            'suffix': suffix,
-                            'image': image_url,
-                        }
-                        response_code = 200
-
-                        # chmod 770 (Grant rwx access to www-data.www-data 'user.group')
-                        os.chmod(resized_image_file.name, S_IRWXU + S_IRWXG)
-                        resized_image_file.close()
-                        f.close()
+                    response_data = {
+                        'status': 'resized',
+                        'width': to_width,
+                        'height': to_height,
+                        'suffix': suffix,
+                        'image': image_url,
+                    }
+                    response_code = 200
                 else:
                     # Return image as string
-                    with NamedTemporaryFile("r+b", prefix='ocv_resized_', suffix=suffix) as resized_image_file:
-                        cv2.imwrite(resized_image_file.name, processed_image)
+                    img_bytes = resized_image_file.read()
+                    string_image = base64.b64encode(img_bytes).decode('utf8')
 
-                        img_bytes = resized_image_file.read()
-                        string_image = base64.b64encode(img_bytes).decode('utf8')
-
-                        response_data = {
-                            'status': 'resized',
-                            'width': to_width,
-                            'height': to_height,
-                            'suffix': suffix,
-                            'image': string_image,
-                        }
-                        response_code = 200
-
-                        # TODO: check if it is possible to close (and then delete)
-                        # files asynchonously
-                        resized_image_file.close()
-                        f.close()
+                    response_data = {
+                        'status': 'resized',
+                        'width': to_width,
+                        'height': to_height,
+                        'suffix': suffix,
+                        'image': string_image,
+                    }
+                    response_code = 200
         except Exception as e:
             print(e)
 
+        # TODO: check if it is possible to close (and then delete) files asynchonously
+        resized_image_file.close()
+        f.close()
         return JsonResponse(response_data, status=response_code)
