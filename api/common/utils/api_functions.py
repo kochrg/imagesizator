@@ -67,3 +67,16 @@ def get_named_temporary_file(prefix, suffix, publish=False, temporal=True):
         temporary_file = NamedTemporaryFile("r+b", prefix=prefix, suffix=suffix)
 
         return temporary_file
+
+
+def get_file_expiration_date(request):
+    expiration = 60*60*24  # Default: 24hs.
+    try:
+        expiration = int(request.data["expiration"])
+    except Exception as e:
+        print(e)
+        user_default = get_parameter_value('default_expiration_time')  # seconds
+        if user_default:
+            expiration = user_default
+
+    return expiration
