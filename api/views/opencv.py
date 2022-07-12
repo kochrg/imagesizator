@@ -6,7 +6,12 @@ from rest_framework import permissions
 import base64
 import cv2
 
-from api.common.utils.api_functions import get_named_temporary_file, get_parameter_value, get_publish_file_path
+from api.models import ImagesizatorTemporaryFile
+from api.common.utils.api_functions import \
+    get_named_temporary_file, \
+    get_parameter_value, \
+    get_publish_file_path, \
+    get_file_expiration_date
 
 
 # User must be logged to use this endpoint.
@@ -51,7 +56,18 @@ class OpenCVImageResize(RetrieveAPIView):
                 
                 resized_image_file = get_named_temporary_file('ocv_resized_', suffix, publish, temporal)
                 cv2.imwrite(resized_image_file.name, processed_image)
-                
+
+                img_bytes = resized_image_file.read()
+                string_image = base64.b64encode(img_bytes).decode('utf8')
+
+                # Create an entry for the file created
+                imagesizator_temporary_file = ImagesizatorTemporaryFile(
+                    path=str(resized_image_file.name),
+                    bytes_string=string_image,
+                )
+                imagesizator_temporary_file.save(seconds=get_file_expiration_date(request))
+
+                response_code = 200
                 if publish:
                     publish_url = get_publish_file_path(temporal)
                     image_url = get_parameter_value('imagesizator_domain')
@@ -64,12 +80,8 @@ class OpenCVImageResize(RetrieveAPIView):
                         'suffix': suffix,
                         'image': image_url,
                     }
-                    response_code = 200
                 else:
                     # Return image as string
-                    img_bytes = resized_image_file.read()
-                    string_image = base64.b64encode(img_bytes).decode('utf8')
-
                     response_data = {
                         'status': 'resized',
                         'width': to_width,
@@ -77,7 +89,6 @@ class OpenCVImageResize(RetrieveAPIView):
                         'suffix': suffix,
                         'image': string_image,
                     }
-                    response_code = 200
         except Exception as e:
             print(e)
 

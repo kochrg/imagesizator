@@ -75,7 +75,7 @@ def get_file_expiration_date(request):
         expiration = int(request.data["expiration"])
     except Exception as e:
         print(e)
-        user_default = get_parameter_value('default_expiration_time')  # seconds
+        user_default = int(get_parameter_value('default_expiration_time'))  # seconds
         if user_default:
             expiration = user_default
 
