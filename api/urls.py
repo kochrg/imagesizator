@@ -4,6 +4,12 @@ from api import views as api
 app_name = "api"
 
 urlpatterns = [
+    # Scheduler
+    path(
+        "scheduler/delete_expired_files",
+        api.DeleteExpiredFilesView.as_view(),
+        name="delete-expired-files"
+    ),
     # OpenCV
     path(
         "images/opencv",
