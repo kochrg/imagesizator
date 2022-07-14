@@ -1,8 +1,9 @@
-from django.views.generic import View 
+from django.views.generic import View
 from django.http import HttpResponse, HttpResponseServerError, HttpResponseForbidden
 from django.core.management import call_command
 
 from api.common.utils.api_functions import get_parameter_value
+
 
 # Call to command delete_expired_files
 class DeleteExpiredFilesView(View):
@@ -26,5 +27,5 @@ class DeleteExpiredFilesView(View):
                 return HttpResponseServerError({'error': e})
 
             return HttpResponse('ok')
-        
+
         return HttpResponseForbidden('Forbidden')

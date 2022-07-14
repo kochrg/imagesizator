@@ -54,7 +54,12 @@ class PILImageResize(RetrieveAPIView):
             # (using memory buffer) fails too.
             # TODO: check if there is a faster way.
 
-            resized_image_file = get_named_temporary_file('pil_resized_', suffix, publish, temporal)
+            resized_image_file = get_named_temporary_file(
+                'pil_resized_',
+                suffix,
+                publish,
+                temporal
+            )
             image_thumbnail.save(resized_image_file.name)
 
             img_bytes = resized_image_file.read()

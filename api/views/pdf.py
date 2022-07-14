@@ -4,7 +4,11 @@ from rest_framework import permissions
 
 import base64
 
-from api.common.utils.api_functions import get_file_expiration_date, get_named_temporary_file, get_parameter_value, get_publish_file_path
+from api.common.utils.api_functions import \
+    get_file_expiration_date, \
+    get_named_temporary_file, \
+    get_parameter_value, \
+    get_publish_file_path
 from api.models import ImagesizatorTemporaryFile
 
 

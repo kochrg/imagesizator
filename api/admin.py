@@ -1,7 +1,6 @@
 from django.contrib import admin
 from api.models import ImagesizatorFile, Parameters, ImagesizatorTemporaryFile
 
-import os
 
 # Register your models here.
 @admin.register(Parameters)

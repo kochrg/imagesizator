@@ -50,11 +50,16 @@ class OpenCVImageResize(RetrieveAPIView):
 
                 # Saving resized image to a temporal file and make it public
                 # NOTE: must be used cv2.imwrite as the function used for save the image,
-                # other saving methods didn't work (fails when trying to save the image).
-                # Use processed_image.tobytes() to avoid save the file (using memory buffer) fails too.
+                # other saving methods didn't work (fails when trying to save the image),
+                # use of processed_image.tobytes() and avoid save the file also (memory buffer).
                 # TODO: check if there is a faster way.
-                
-                resized_image_file = get_named_temporary_file('ocv_resized_', suffix, publish, temporal)
+
+                resized_image_file = get_named_temporary_file(
+                    'ocv_resized_',
+                    suffix,
+                    publish,
+                    temporal
+                )
                 cv2.imwrite(resized_image_file.name, processed_image)
 
                 img_bytes = resized_image_file.read()
