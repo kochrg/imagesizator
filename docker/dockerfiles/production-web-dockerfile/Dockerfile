@@ -3,6 +3,12 @@
 # NOTE: build-context = project-root folder
 
 FROM ubuntu:21.04
+ARG HOST_WWW_DATA_GID
+ARG HOST_USER_GID
+ARG HOST_USER_GNAME
+ARG HT_USER
+ARG HT_PASSWD
+
 WORKDIR /var/www/imagesizator/
 
 ENV TZ=America/Argentina
@@ -16,12 +22,12 @@ RUN apt upgrade -y
 RUN apt install nano -y
 
 # Install apache2
-RUN apt install apache2 -y
+RUN apt install apache2 apache2-utils -y
 
 # Create self-signed certificates by default
 # Replace inside ssl folder to use custom certificates
 # Installing certificates
-RUN apt-get install -y openssl
+RUN apt-get install openssl -y
 
 # Installing certificates
 COPY ./docker/dockerfiles/production-web-dockerfile/conf/ssl/server-certificates/* /etc/apache2/ssl/
@@ -64,11 +70,14 @@ RUN /usr/share/.virtualenvs/imagesizator/bin/opentelemetry-bootstrap --action=in
 # Adding staticfiles
 RUN /usr/share/.virtualenvs/imagesizator/bin/python manage.py collectstatic --no-input
 
-# Change folder owner
-RUN chown -R www-data:www-data /var/www/imagesizator
+# Change folder owner and volume mapping permissions
+RUN sh ./docker/dockerfiles/production-web-dockerfile/init.sh ${HOST_WWW_DATA_GID}
+RUN groupadd -g ${HOST_USER_GID} ${HOST_USER_GNAME}
+RUN adduser www-data ${HOST_USER_GNAME}
 
 # Adding apache host
 COPY ./docker/dockerfiles/production-web-dockerfile/conf/imagesizator.conf /etc/apache2/sites-available/imagesizator.conf
+RUN sh ./docker/dockerfiles/production-web-dockerfile/conf/apachepasswd.sh ${HT_USER} ${HT_PASSWD}
 RUN a2enmod ssl
 RUN a2enmod wsgi
 RUN a2ensite imagesizator.conf

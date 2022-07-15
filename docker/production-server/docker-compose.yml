@@ -13,6 +13,28 @@ services:
     restart: unless-stopped
     volumes:
       - ../../database:/var/www/imagesizator/database
+      - ../../public:/var/www/imagesizator/public
     ports:
       - "80:80"
       - "443:443"
+    networks:
+      static-network:
+        ipv4_address: 10.22.13.2
+  scheduler:
+    container_name: scheduler-container
+    build:
+      context: ../../
+      dockerfile: ./docker/dockerfiles/scheduler-dockerfile/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - web-server
+    networks:
+      static-network:
+        ipv4_address: 10.22.13.3
+
+networks:
+  static-network:
+    name: imagesizator-network
+    ipam:
+      config:
+        - subnet: 10.22.13.0/24

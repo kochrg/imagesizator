@@ -1,4 +1,3 @@
-from tempfile import NamedTemporaryFile
 from django.http import JsonResponse
 from django.core.files.base import ContentFile
 from rest_framework.generics import RetrieveAPIView
@@ -6,6 +5,13 @@ from rest_framework import permissions
 from PIL import Image
 
 import base64
+
+from api.models import ImagesizatorTemporaryFile
+from api.common.utils.api_functions import \
+    get_named_temporary_file, \
+    get_parameter_value, \
+    get_publish_file_path, \
+    get_file_expiration_date
 
 
 # User must be logged to use this endpoint.
@@ -27,6 +33,15 @@ class PILImageResize(RetrieveAPIView):
             # bytes image in format: base64.b64encode(image).decode('utf8')
             image = base64.b64decode(request.data["image"])
 
+            # publish the image or send string back?
+            publish = False
+            temporal = False
+            try:
+                publish = True if request.data["publish"] == 'yes' else False
+                temporal = True if request.data["temporal"] == 'yes' else False
+            except Exception as e:
+                print(e)
+
             image_thumbnail = Image.open(
                 ContentFile(image, "temp_image" + suffix)
             )
@@ -35,18 +50,42 @@ class PILImageResize(RetrieveAPIView):
             # Saving resized image to a temporal file
             # NOTE: must be used image_thumbnail.save() as the function used
             # for save the image, other saving methods didn't work (fails when saving).
-            # Use image_thumbnail.tobytes() to avoid save the file
+            # Using image_thumbnail.tobytes() to avoid save the file
             # (using memory buffer) fails too.
             # TODO: check if there is a faster way.
-            with NamedTemporaryFile(
-                "r+b", prefix='pil_resized_',
-                suffix=suffix
-            ) as resized_image_file:
-                image_thumbnail.save(resized_image_file.name)
 
-                img_bytes = resized_image_file.read()
-                string_image = base64.b64encode(img_bytes).decode('utf8')
+            resized_image_file = get_named_temporary_file(
+                'pil_resized_',
+                suffix,
+                publish,
+                temporal
+            )
+            image_thumbnail.save(resized_image_file.name)
 
+            img_bytes = resized_image_file.read()
+            string_image = base64.b64encode(img_bytes).decode('utf8')
+
+            # Create an entry for the file created
+            imagesizator_temporary_file = ImagesizatorTemporaryFile(
+                path=str(resized_image_file.name),
+                bytes_string=string_image,
+            )
+            imagesizator_temporary_file.save(seconds=get_file_expiration_date(request))
+
+            response_code = 200
+            if publish:
+                publish_url = get_publish_file_path(temporal)
+                image_url = get_parameter_value('imagesizator_domain')
+                image_url += publish_url + resized_image_file.name.split('/')[-1]
+
+                response_data = {
+                    'status': 'resized',
+                    'width': to_width,
+                    'height': to_height,
+                    'suffix': suffix,
+                    'image': image_url,
+                }
+            else:
                 response_data = {
                     'status': 'resized',
                     'width': to_width,
@@ -54,9 +93,8 @@ class PILImageResize(RetrieveAPIView):
                     'suffix': suffix,
                     'image': string_image,
                 }
-                response_code = 200
-                resized_image_file.close()
         except Exception as e:
             print(e)
 
+        resized_image_file.close()
         return JsonResponse(response_data, status=response_code)

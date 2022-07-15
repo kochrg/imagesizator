@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model, authenticate
 from django.core.management.base import BaseCommand
-from utils.bcolors import bcolors
+from api.common.utils.bcolors import bcolors
 from api.models import Parameters
 
 User = get_user_model()
@@ -16,7 +16,11 @@ class Command(BaseCommand):
         if not User.objects.filter(username='admin').exists():
             email = 'email@example.com'
             print('Creating account for %s (%s)' % (username, email))
-            admin = User.objects.create_superuser(email=email, username=username, password=password)
+            admin = User.objects.create_superuser(
+                email=email,
+                username=username,
+                password=password
+            )
             admin.is_active = True
             admin.is_admin = True
             admin.save()
@@ -27,14 +31,17 @@ class Command(BaseCommand):
             user = authenticate(username=username, password=password)
             if user is not None:
                 # Default admin password, WARNING!!
-                print(f"{bcolors.WARNING}WARNING!! You have the default admin password!!{bcolors.ENDC}")
+                print(
+                    f"{bcolors.WARNING}WARNING!! You have the \
+                        default admin password!!{bcolors.ENDC}"
+                )
                 print(
                     f"{bcolors.WARNING}Change it from Django admin. "
                     + f"View the Readme.md file for more details.{bcolors.ENDC}"
                 )
 
         print(f"{bcolors.OKBLUE}Adding imagesizator parameters if not exists.{bcolors.ENDC}")
-        
+
         if not Parameters.objects.filter(key='enable_otlp'):
             enable_otlp = Parameters(
                 key='enable_otlp',
