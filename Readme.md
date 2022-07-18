@@ -80,7 +80,7 @@ To use your self-signed certificates follow the next steps:
 *NOTE: only change **the name of the file**, not the path, it is relative to docker configuration.*
 
 
-### Monitoring with SigNoz or other OpenTlemetry application (optional)
+### Monitoring with SigNoz or other OpenTelemetry application (optional)
 
 Imagesizator is compatible with OpenTelemetry Django instrumentation that enables generation of telemetry data from a Django application. The data is then used to monitor performance of a Django application with a monitoring tool like Datadog, New Relic or SigNoz (an open-source monitoring tool).
 
@@ -195,15 +195,29 @@ Slightly faster than opencv.
 - ``Content-Type: application/json``
 
 **Data:**
+- action = "resize" is the only action available now.
+- to_width = "your_width" (integer). Final width of the resized image.
+- to_height = "your_height" (integer). Final height of the resized image.
+- suffix = "the_file_extension" (i. e.: ".jpg") **!important**.
+- publish (optional) = "yes" to publish the image and get the url. "no" by default.
+- temporal (optional) = "yes" if you want to publish the image to be available for a period of time (default option).
+                        "no" will publish the image in a *static* url and the file will never be deleted automatically.
+- expiration (optional) = "seconds" (integer). Seconds starting from when the endpoint call is made that the image will be published. Only available for *temporal* images. Default 24 hs.
+- image = the image as a bytes string.
+
 ```json
 {
     "action": "resize",
     "to_width": "your_width",
     "to_height": "your_height",
     "suffix": "the_file_extension",
+    "publish": "yes"/"no",
+    "temporal": "yes"/"no",
+    "expiration": "seconds",
     "image": "image_as_string",
 }
 ```
+
 
 ## Resizing with OpenCV
 **Endpoint URI:** ``/images/opencv``
@@ -215,12 +229,49 @@ Slightly faster than opencv.
 - ``Content-Type: application/json``
 
 **Data:**
+- action = "resize" is the only action available now.
+- to_width = "your_width" (integer). Final width of the resized image.
+- to_height = "your_height" (integer). Final height of the resized image.
+- suffix = "the_file_extension" (i. e.: ".jpg") **!important**.
+- publish (optional) = "yes" to publish the image and get the url. "no" by default.
+- temporal (optional) = "yes" if you want to publish the image to be available for a period of time (default option).
+                        "no" will publish the image in a *static* url and the file will never be deleted automatically.
+- expiration (optional) = "seconds" (integer). Seconds starting from when the endpoint call is made that the image will be published. Only available for *temporal* images. Default 24 hs.
+- image = the image as a bytes string.
+
 ```json
 {
     "action": "resize",
     "to_width": "your_width",
     "to_height": "your_height",
+    "publish": "yes"/"no",
+    "temporal": "yes"/"no",
+    "expiration": "seconds",
     "suffix": "the_file_extension",
     "image": "image_as_string" 
+}
+```
+
+
+## Publish pdf files
+**Endpoint URI:** ``/images/pdf/publish``
+
+**Method:** POST
+
+**Headers:**
+- ``Authorization: Token authorized_user_token``
+- ``Content-Type: application/json``
+
+**Data:**
+- temporal = "yes" if you want to publish the image to be available for a period of time (default option).
+             "no" will publish the image in a *static* url and the file will never be deleted automatically.
+- expiration (optional) = "seconds" (integer). Seconds starting from when the endpoint call is made that the image will be published. Only available for *temporal* images. Default 24 hs.
+- image = the image as a bytes string.
+
+```json
+{
+    "temporal": "yes"/"no",
+    "expiration": "seconds",
+    "image": "image_as_string"
 }
 ```
