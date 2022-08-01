@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM ubuntu:21.04
+FROM ubuntu:20.04
 ARG S_TIME
 ENV S_TIME=${S_TIME}
 

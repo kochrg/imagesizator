@@ -2,7 +2,7 @@
 
 # NOTE: build-context = project-root folder
 
-FROM ubuntu:21.04
+FROM ubuntu:20.04
 ARG HOST_WWW_DATA_GID
 ARG HOST_USER_GID
 ARG HOST_USER_GNAME
