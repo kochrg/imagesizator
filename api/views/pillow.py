@@ -8,6 +8,7 @@ import base64
 
 from api.models import ImagesizatorTemporaryFile
 from api.common.utils.api_functions import \
+    get_final_image_width_and_height, \
     get_named_temporary_file, \
     get_parameter_value, \
     get_publish_file_path, \
@@ -42,10 +43,23 @@ class PILImageResize(RetrieveAPIView):
             except Exception as e:
                 print(e)
 
+            keep_proportion = 'none'
+            try:
+                keep_proportion = request.data["keep_proportion"] if request.data["keep_proportion"] else "none"
+            except Exception:
+                print("Parameter keep_proportion missed.")
+
             image_thumbnail = Image.open(
                 ContentFile(image, "temp_image" + suffix)
             )
-            image_thumbnail.thumbnail((to_width, to_height))
+            final_w_h = get_final_image_width_and_height(
+                image_thumbnail.width,
+                image_thumbnail.height,
+                to_width,
+                to_height,
+                keep_proportion
+            )
+            image_thumbnail.thumbnail(final_w_h)
 
             # Saving resized image to a temporal file
             # NOTE: must be used image_thumbnail.save() as the function used
@@ -80,16 +94,16 @@ class PILImageResize(RetrieveAPIView):
 
                 response_data = {
                     'status': 'resized',
-                    'width': to_width,
-                    'height': to_height,
+                    'width': final_w_h[0],
+                    'height': final_w_h[1],
                     'suffix': suffix,
                     'image': image_url,
                 }
             else:
                 response_data = {
                     'status': 'resized',
-                    'width': to_width,
-                    'height': to_height,
+                    'width': final_w_h[0],
+                    'height': final_w_h[1],
                     'suffix': suffix,
                     'image': string_image,
                 }

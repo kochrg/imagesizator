@@ -80,3 +80,22 @@ def get_file_expiration_date(request):
             expiration = user_default
 
     return expiration
+
+
+def get_final_image_width_and_height(o_width, o_height, to_width, to_height, keep_proportion='none'):
+    """
+    Return a tuple with the final width and height of the image.
+    keep_proportion = 'landscape': resize to_height, width proportionally.
+                      'portrait': resize to_width, height proportionally.
+                      'none' (default): resize to_width and to_heigth no matter proportions.
+    """
+    final_width = to_width
+    final_height = to_height
+
+    if keep_proportion == 'portrait':
+        final_height = int(to_width * o_height / o_width)
+    elif keep_proportion == 'landscape':
+        final_width = int(to_height * o_width / o_height)
+    # else resize ommiting ratio
+
+    return (int(final_width), int(final_height))

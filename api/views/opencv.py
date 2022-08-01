@@ -46,6 +46,7 @@ class OpenCVImageResize(RetrieveAPIView):
             with NamedTemporaryFile("wb", suffix=suffix) as f:
                 f.write(image)
                 processed_image = cv2.imread(f.name)
+                print("Image size:", processed_image)
                 processed_image = cv2.resize(processed_image, (to_width, to_height))
 
                 # Saving resized image to a temporal file and make it public
