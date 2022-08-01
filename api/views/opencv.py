@@ -11,7 +11,8 @@ from api.common.utils.api_functions import \
     get_named_temporary_file, \
     get_parameter_value, \
     get_publish_file_path, \
-    get_file_expiration_date
+    get_file_expiration_date, \
+    get_final_image_width_and_height
 
 
 # User must be logged to use this endpoint.
@@ -42,12 +43,25 @@ class OpenCVImageResize(RetrieveAPIView):
             except Exception as e:
                 print(e)
 
+            keep_proportion = 'none'
+            try:
+                keep_proportion = request.data["keep_proportion"] if request.data["keep_proportion"] else "none"
+            except Exception:
+                print("Parameter keep_proportion missed.")
+
             # Need to save the image from request because cv2.imread only works with a path
             with NamedTemporaryFile("wb", suffix=suffix) as f:
                 f.write(image)
                 processed_image = cv2.imread(f.name)
-                print("Image size:", processed_image)
-                processed_image = cv2.resize(processed_image, (to_width, to_height))
+                
+                final_w_h = get_final_image_width_and_height(
+                    processed_image.shape[1],  # original width
+                    processed_image.shape[0],  # original height
+                    to_width,
+                    to_height,
+                    keep_proportion
+                )
+                processed_image = cv2.resize(processed_image, final_w_h)
 
                 # Saving resized image to a temporal file and make it public
                 # NOTE: must be used cv2.imwrite as the function used for save the image,
@@ -81,8 +95,8 @@ class OpenCVImageResize(RetrieveAPIView):
 
                     response_data = {
                         'status': 'resized',
-                        'width': to_width,
-                        'height': to_height,
+                        'width': final_w_h[0],
+                        'height': final_w_h[1],
                         'suffix': suffix,
                         'image': image_url,
                     }
@@ -90,8 +104,8 @@ class OpenCVImageResize(RetrieveAPIView):
                     # Return image as string
                     response_data = {
                         'status': 'resized',
-                        'width': to_width,
-                        'height': to_height,
+                        'width': final_w_h[0],
+                        'height': final_w_h[1],
                         'suffix': suffix,
                         'image': string_image,
                     }
