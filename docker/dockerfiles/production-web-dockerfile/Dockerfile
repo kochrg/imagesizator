@@ -33,7 +33,7 @@ RUN apt-get install openssl -y
 COPY ./docker/dockerfiles/production-web-dockerfile/conf/ssl/server-certificates/* /etc/apache2/ssl/
 
 # Config project env
-RUN apt install python3.9 python3.9-dev python3.9-distutils python3-pip python3.9-venv -y
+RUN apt install python3 python3-dev python3-distutils python3-pip python3-venv -y
 RUN pip3 install virtualenv
 RUN pip3 install virtualenvwrapper
 
@@ -54,7 +54,7 @@ COPY ./docker/dockerfiles/production-web-dockerfile/conf/django/wsgi.py \
 
 # Creating venv
 RUN python3 -m venv /usr/share/.virtualenvs/imagesizator
-RUN echo "export PYTHONPATH='/usr/bin/python3.9'" >> /usr/share/.virtualenvs/imagesizator/bin/activate
+RUN echo "export PYTHONPATH='/usr/bin/python3'" >> /usr/share/.virtualenvs/imagesizator/bin/activate
 RUN /usr/share/.virtualenvs/imagesizator/bin/pip3 install -r requirements.txt
 RUN chmod 777 -R /usr/share/.virtualenvs
 

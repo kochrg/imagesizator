@@ -27,12 +27,12 @@ If you want to try or test the project, you can run in a **dev mode** with Djang
 
 ```shell
 # Config project env
-apt install python3.9 python3.9-dev python3.9-distutils python3-pip python3.9-venv -y
+apt install python3 python3-dev python3-distutils python3-pip python3-venv -y
 pip3 install virtualenv
 pip3 install virtualenvwrapper
 
 python3 -m venv /usr/share/.virtualenvs/imagesizator
-echo "export PYTHONPATH='/usr/bin/python3.9'" >> /usr/share/.virtualenvs/imagesizator/bin/activate
+echo "export PYTHONPATH='/usr/bin/python3'" >> /usr/share/.virtualenvs/imagesizator/bin/activate
 
 # Start the venv
 workon imagesizator
