@@ -8,6 +8,9 @@ def get_parameter_value(key):
     try:
         parameter = Parameters.objects.get(key=key)
 
+        if parameter.value == 'None':
+            return False
+
         return parameter.value
     except Parameters.DoesNotExist:
         print("Error obteniendo el parametro: " + str(key))
