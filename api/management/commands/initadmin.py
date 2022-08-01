@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model, authenticate
 from django.core.management.base import BaseCommand
+from api.common.utils.api_functions import add_parameter_if_not_exists
 from api.common.utils.bcolors import bcolors
 from api.models import Parameters
 
@@ -42,30 +43,8 @@ class Command(BaseCommand):
 
         print(f"{bcolors.OKBLUE}Adding imagesizator parameters if not exists.{bcolors.ENDC}")
 
-        if not Parameters.objects.filter(key='enable_otlp'):
-            enable_otlp = Parameters(
-                key='enable_otlp',
-                value='no'
-            )
-            enable_otlp.save()
-
-        if not Parameters.objects.filter(key='otlp_resource_attributes'):
-            otlp_resource_attributes = Parameters(
-                key='otlp_resource_attributes',
-                value='imagesizator-service'
-            )
-            otlp_resource_attributes.save()
-
-        if not Parameters.objects.filter(key='otlp_endpoint_url'):
-            otlp_endpoint_url = Parameters(
-                key='otlp_endpoint_url',
-                value='http://127.0.0.1:4317'
-            )
-            otlp_endpoint_url.save()
-
-        if not Parameters.objects.filter(key='otlp_insecure_endpoint'):
-            otlp_insecure_endpoint = Parameters(
-                key='otlp_insecure_endpoint',
-                value='yes'  # insecure by default
-            )
-            otlp_insecure_endpoint.save()
+        add_parameter_if_not_exists('enable_otlp', 'no')
+        add_parameter_if_not_exists('otlp_resource_attributes', 'imagesizator-service')
+        add_parameter_if_not_exists('otlp_endpoint_url', 'http://127.0.0.1:4317')
+        add_parameter_if_not_exists('otlp_insecure_endpoint', 'yes')
+        add_parameter_if_not_exists('imagesizator_user_allowed_hosts', 'None')

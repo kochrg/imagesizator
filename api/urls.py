@@ -28,4 +28,10 @@ urlpatterns = [
         api.PublishPDFFile.as_view(),
         name="publish-pdf-file"
     ),
+    # Publish any type of file without modifications
+    path(
+        "files/publish",
+        api.PublishFile.as_view(),
+        name="publish-any-file"
+    ),
 ]
