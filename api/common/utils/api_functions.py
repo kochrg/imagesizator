@@ -13,7 +13,9 @@ def get_parameter_value(key):
 
         return parameter.value
     except Parameters.DoesNotExist:
-        print("Error obteniendo el parametro: " + str(key))
+        print("Error getting parameter: " + str(key))
+    except Exception as e:
+        print("Error (get_aparameter_value):", e)
 
     return False
 
