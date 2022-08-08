@@ -34,4 +34,9 @@ urlpatterns = [
         api.PublishFile.as_view(),
         name="publish-any-file"
     ),
+    path(
+        "images/viewer/",
+        api.browserFileViewer.as_view(),
+        name="publish-file-in-browser-viewer"
+    ),
 ]

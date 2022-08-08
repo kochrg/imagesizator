@@ -275,3 +275,15 @@ Slightly faster than opencv.
     "image": "image_as_string"
 }
 ```
+
+# Browser viewer
+By default the url returned in endpoints points directly to the file. In case that you have Apache basic authentication enable you have to put a user and password to access to the image. In older or mobile browsers it could not work properly, and the same happens if you are working with *React Native webview* package. To avoid this problem, Imagesizator can serve the file using a simple GET method and passing an **imagesizator_user_token** and **path_to_the_file** as GET parameters in the url. For example:
+
+- imagesizator service url: http://imagesizator.domain.com
+- file_path: http://imagesizator.domain.com/public/temp/file_name.jpg (or it could be only: public/temp/file_name.jpg).
+- token: a_registered_user_token
+- imagesizator_viewer_url: http://imagesizator.domain.com/images/viewer/?=token=*a_user_registered_token*&path=*path_to_the_file_or_url*
+
+So, in this case the final path is:
+
+*http://imagesizator.domain.com/images/viewer/?token=a_registered_user_token&path=http://imagesizator.domain.com/public/temp/file_name.jpg*
