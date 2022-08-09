@@ -9,7 +9,7 @@ def get_parameter_value(key):
         parameter = Parameters.objects.get(key=key)
 
         if parameter.value == 'None':
-            return False
+            return None
 
         return parameter.value
     except Parameters.DoesNotExist:
@@ -28,7 +28,7 @@ def add_parameter_if_not_exists(key, value):
 
     if parameter is not None:
         if not parameter:
-            print("Añadiendo el parámetro:", key)
+            print("Adding parameter:", key)
             Parameters(
                 key=key,
                 value=value
