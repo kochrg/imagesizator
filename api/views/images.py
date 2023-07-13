@@ -70,9 +70,6 @@ class ImageResizeView(RetrieveAPIView):
                     keep_proportion,
                     suffix
                 )
-            
-            if service == "pdf":
-                pass
 
             # Create an entry for the file created
             if temporal:
