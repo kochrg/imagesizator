@@ -149,9 +149,9 @@ chmod 777 ./database/db.sqlite3
 - ``HOST_WWW_DATA_GID=$(getent group www-data | cut -d: -f3)``: always this value.
 - ``HOST_USER_GID=$(id -g)``: always this value.
 - ``HOST_USER_GNAME=$(getent group $(id -g) | cut -d: -f1)``: always this value.
-- ``HT_USER=username`` (optional): add this username to secure public folders when the images will be published.  
-- ``HT_PASSWD=username`` (optional): add this password to secure public folders when the images will be published.
-- ``S_TIME="* * * * *"  # Cron format`` (optional): when you want the deamon looks for expired images and delete it. I. e.: ``"0 0 * * *"`` means *every day at 00:00* (default).
+- ``HT_USER=username`` (optional): add this username to secure public folders where the images will be published.  
+- ``HT_PASSWD=username`` (optional): add this password to secure public folders where the images will be published.
+- ``S_TIME="* * * * *"  # Cron format`` (optional): if you want the deamon looks for expired images and delete it. I. e.: ``"0 0 * * *"`` means *every day at 00:00* (default).
 
 1. Inside *docker/production-server* folder, run:
 ```shell
