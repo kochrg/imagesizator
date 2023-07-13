@@ -9,7 +9,7 @@ from api.common.utils.api_functions import \
     get_named_temporary_file, \
     get_parameter_value, \
     get_publish_file_path
-from api.models import ImagesizatorTemporaryFile
+from api.models import ImagesizatorTemporaryFile, ImagesizatorFile
 
 
 # User must be logged to use this endpoint.
@@ -41,11 +41,18 @@ class PublishPDFFile(RetrieveAPIView):
             pdf_image_file.write(image)
 
             # Create an entry for the file created
-            imagesizator_temporary_file = ImagesizatorTemporaryFile(
-                path=str(pdf_image_file.name),
-                bytes_string=request.data["image"],
-            )
-            imagesizator_temporary_file.save(seconds=get_file_expiration_date(request))
+            if temporal:
+                imagesizator_temporary_file = ImagesizatorTemporaryFile(
+                    path=str(pdf_image_file.name),
+                    bytes_string=request.data["image"],
+                )
+                imagesizator_temporary_file.save(seconds=get_file_expiration_date(request))
+            else:
+                imagesizator_file = ImagesizatorFile(
+                    path=str(pdf_image_file.name),
+                    bytes_string=request.data["image"],
+                )
+                imagesizator_file.save()      
 
             publish_url = get_publish_file_path(temporal)
             image_url = get_parameter_value('imagesizator_domain')

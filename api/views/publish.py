@@ -1,23 +1,24 @@
-from django.http import JsonResponse, HttpResponse
+import base64
+
+from django.http import JsonResponse, HttpResponse, FileResponse
 from rest_framework.authtoken.models import Token
 from rest_framework.generics import RetrieveAPIView
 from rest_framework import permissions
-
-from django.http import FileResponse
-
-import base64
 
 from api.common.utils.api_functions import \
     get_file_expiration_date, \
     get_named_temporary_file, \
     get_parameter_value, \
     get_publish_file_path
-from api.models import ImagesizatorTemporaryFile
+from api.models import ImagesizatorTemporaryFile, ImagesizatorFile
 
 
 # User must be logged to use this endpoint.
 # Use 'Authorization: Token the_token' header.
 class PublishFile(RetrieveAPIView):
+    """
+    Publish any type of file without modifications
+    """
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
@@ -44,11 +45,18 @@ class PublishFile(RetrieveAPIView):
             any_type_file.write(file)
 
             # Create an entry for the file created
-            imagesizator_temporary_file = ImagesizatorTemporaryFile(
-                path=str(any_type_file.name),
-                bytes_string=request.data["file"],
-            )
-            imagesizator_temporary_file.save(seconds=get_file_expiration_date(request))
+            if temporal:
+                imagesizator_temporary_file = ImagesizatorTemporaryFile(
+                    path=str(any_type_file.name),
+                    bytes_string=request.data["file"],
+                )
+                imagesizator_temporary_file.save(seconds=get_file_expiration_date(request))
+            else:
+                imagesizator_file = ImagesizatorFile(
+                    path=str(any_type_file.name),
+                    bytes_string=request.data["file"],
+                )
+                imagesizator_file.save()
 
             publish_url = get_publish_file_path(temporal)
             file_url = get_parameter_value('imagesizator_domain')
@@ -73,13 +81,15 @@ class browserFileViewer(RetrieveAPIView):
     permission_classes = []
 
     def get(self, request, *args, **kwargs):
+        """
+        Return a FileResponse to open the file in a web browser
+        """
         try:
             # path could be the entire url returned by an imagesizator endpoint
             # or a path, starting from public. I. e.: public/temp/name_of_file
             url = request.GET['path']
             token = request.GET['token']
-            print("URL:", url)
-            print("Token:", token)
+
             # Check if it is a valid token
             token_query = Token.objects.filter(key=token)
             if token == None or not token_query.exists():
