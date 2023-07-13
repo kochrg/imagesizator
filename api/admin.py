@@ -30,7 +30,6 @@ class ImagesizatorTemporaryFileAdmin(admin.ModelAdmin):
     list_display = (
         'created_at',
         'path',
-        'bytes_string',
         'expiration_date'
     )
     search_fields = ('created_at', 'path')

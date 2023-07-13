@@ -10,17 +10,11 @@ urlpatterns = [
         api.DeleteExpiredFilesView.as_view(),
         name="delete-expired-files"
     ),
-    # OpenCV
+    # Images
     path(
-        "images/opencv",
-        api.OpenCVImageResize.as_view(),
-        name="opencv-image-resize"
-    ),
-    # Pillow
-    path(
-        "images/pillow",
-        api.PILImageResize.as_view(),
-        name="pillow-image-resize"
+        "images/<service>",
+        api.ImageResizeView.as_view(),
+        name="image-resize"
     ),
     # PDF
     path(
