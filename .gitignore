@@ -5,8 +5,10 @@ db.sqlite3
 docker/dockerfiles/production-web-dockerfile/conf/ssl/server-certificates/*
 docker/dockerfiles/production-web-dockerfile/conf/imagesizator.conf
 
-public/temp/*
-public/static/*
+*/protected/temp/*
+*/protected/static/*
+*/public/temp/*
+*/public/static/*
 
 ## Never ignore
 !.gitkeep
