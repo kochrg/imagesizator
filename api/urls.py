@@ -3,6 +3,7 @@ from api import views as api
 
 app_name = "api"
 
+# API V-1.0
 urlpatterns = [
     # Scheduler
     path(
@@ -34,3 +35,5 @@ urlpatterns = [
         name="publish-any-file"
     ),
 ]
+
+# API V-1.1
