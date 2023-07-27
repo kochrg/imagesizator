@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', default=get_random_secret_key())
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = bool(int(os.getenv('DEBUG', 0)))
+DEBUG = bool(int(os.getenv('DEBUG', 1)))
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', None)
 if ALLOWED_HOSTS:
@@ -148,3 +148,17 @@ PUBLIC_FOLDER = 'www/public/'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# REDIS
+# Celery settings
+CELERY_TASK_ALWAYS_EAGER = bool(int(os.environ.get('CELERY_TASK_ALWAYS_EAGER', 0)))  # For production always False
+CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', "redis://localhost:6379")
+CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND', "redis://localhost:6379")
+
+
+# custom settings for local environment
+try:  # noqa: SIM105
+    from .local_settings import *  # noqa: F401, F403
+except ImportError:
+    pass

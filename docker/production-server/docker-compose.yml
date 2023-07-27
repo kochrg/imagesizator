@@ -34,7 +34,17 @@ services:
     networks:
       static-network:
         ipv4_address: 10.22.13.2
-    
+  scheduler:
+    container_name: scheduler
+    build:
+      context: ../../
+      dockerfile: ./docker/dockerfiles/scheduler-dockerfile/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - web-server
+    networks:
+      static-network:
+        ipv4_address: 10.22.13.3
 
 networks:
   static-network:
