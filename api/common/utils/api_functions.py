@@ -45,6 +45,7 @@ def diff_month(d1, d2):
     return (d1.year - d2.year) * 12 + d1.month - d2.month
 
 
+# DEPRECATED (now in model)
 def get_publish_file_path(temporal):
     path = "/public/temp/"
     if not temporal:
@@ -52,6 +53,7 @@ def get_publish_file_path(temporal):
     return path
 
 
+# DEPRECATED (now in model)
 def get_named_temporary_file(prefix, suffix, publish=False, temporal=True):
     if publish:
         # Return image public url
@@ -74,6 +76,7 @@ def get_named_temporary_file(prefix, suffix, publish=False, temporal=True):
         return temporary_file
 
 
+# DEPRECATED (now in model)
 def get_file_expiration_date(request):
     expiration = 60*60*24  # Default: 24hs.
     try:
@@ -87,6 +90,7 @@ def get_file_expiration_date(request):
     return expiration
 
 
+# DEPRECATED (now in model)
 def get_final_image_width_and_height(o_width, o_height, to_width, to_height, keep_proportion='none'):
     """
     Return a tuple with the final width and height of the image.

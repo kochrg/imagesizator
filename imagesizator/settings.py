@@ -141,8 +141,8 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 # Imagesizator folders
-PROTECTED_FOLDER = 'www/protected/'
-PUBLIC_FOLDER = 'www/public/'
+PROTECTED_FOLDER = 'www/protected'
+PUBLIC_FOLDER = 'www/public'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
