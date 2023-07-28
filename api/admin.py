@@ -2,7 +2,6 @@ from django.contrib import admin
 from api.models import ImagesizatorFile, Parameters, ImagesizatorTemporaryFile
 
 
-# Register your models here.
 @admin.register(Parameters)
 class ParametersAdmin(admin.ModelAdmin):
     list_display = (
@@ -23,6 +22,14 @@ class ImagesizatorFileAdmin(admin.ModelAdmin):
     search_fields = ('created_at', 'path')
     ordering = ('-created_at',)
     list_display_links = ('path',)
+    actions = ['delete_model', 'delete_queryset']
+
+    def delete_queryset(self, request, queryset):
+        for obj in queryset:
+            obj.delete()
+
+    def delete_model(self, request, obj):
+        obj.delete()
 
 
 @admin.register(ImagesizatorTemporaryFile)
@@ -35,3 +42,11 @@ class ImagesizatorTemporaryFileAdmin(admin.ModelAdmin):
     search_fields = ('created_at', 'path')
     ordering = ('-created_at',)
     list_display_links = ('path',)
+    actions = ['delete_model', 'delete_queryset']
+
+    def delete_queryset(self, request, queryset):
+        for obj in queryset:
+            obj.delete()
+
+    def delete_model(self, request, obj):
+        obj.delete()
