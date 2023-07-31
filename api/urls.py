@@ -3,7 +3,7 @@ from api import views as api
 
 app_name = "api"
 
-# API V-1.0
+# GENERIC
 urlpatterns = [
     # Scheduler
     path(
@@ -11,6 +11,10 @@ urlpatterns = [
         api.DeleteExpiredFilesView.as_view(),
         name="delete-expired-files"
     ),
+]
+
+# API V-1.0
+urlpatterns += [
     # PDF
     path(
         "images/pdf/publish",
@@ -37,3 +41,11 @@ urlpatterns = [
 ]
 
 # API V-1.1
+urlpatterns += [
+    # Publish any type of file without modifications
+    path(
+        "publish/<protected>/<static>",
+        api.NewPublishFile.as_view(),
+        name="new-publish-file"
+    ),
+]

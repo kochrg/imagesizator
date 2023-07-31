@@ -21,11 +21,7 @@ def create_auth_token(sender, instance=None, created=False, **kwargs):
 # ------------------------- CUSTOM MODELS ---------------------------
 # -------------------------------------------------------------------
 class Parameters(models.Model):
-    created_at = models.DateTimeField(
-        "Fecha de creación",
-        null=True,
-        editable=False
-    )
+    created_at = models.DateTimeField(auto_now_add=True)
     # recommended key format = endpoint_name_parameter_name
     key = models.CharField(
         max_length=100,
@@ -44,13 +40,6 @@ class Parameters(models.Model):
 
     def __str__(self):
         return self.key
-
-    def save(self, *args, **kwargs):
-        if self.created_at is None:
-            self.created_at = timezone_now()
-        super().save(*args, **kwargs)
-
-    save.alters_data = True
 
     @staticmethod
     def get_parameter_value(key):
@@ -88,11 +77,7 @@ class Parameters(models.Model):
 
 
 class ImagesizatorFile(models.Model):
-    created_at = models.DateTimeField(
-        "Created date",
-        null=True,
-        editable=False
-    )
+    created_at = models.DateTimeField(auto_now_add=True)
     path = models.TextField(
         null=False,
         blank=False,
@@ -115,9 +100,23 @@ class ImagesizatorFile(models.Model):
     def __str__(self):
         return self.path
 
-    def save(self, *args, **kwargs):
-        if self.created_at is None:
-            self.created_at = timezone_now()
+    @property
+    def url(self):
+        file_url = Parameters.get_parameter_value('imagesizator_domain')
+        if file_url[:-1] != "/":
+            file_url += "/"
+        file_url += self.path
+        return file_url
+
+    def save(self, decoded_file, suffix, publish_path, *args, **kwargs):
+        any_type_file = self.get_named_temporary_file(
+            suffix,
+            publish_path,
+            'file_' + suffix.replace(".", "") + "_",
+        )
+        any_type_file.write(decoded_file)
+        self.path = str(any_type_file.name)
+        any_type_file.close()
         super().save(*args, **kwargs)
 
     save.alters_data = True
@@ -148,6 +147,23 @@ class ImagesizatorFile(models.Model):
 
         return (int(final_width), int(final_height))
 
+    def get_named_temporary_file(self, suffix, publish_path=None, prefix='file_'):
+        if publish_path:
+            temporary_file = NamedTemporaryFile(
+                "r+b",
+                prefix=prefix,
+                suffix=suffix,
+                dir=publish_path,
+                delete=False
+            )
+
+            # chmod 770 (Grant rwx access to www-data.www-data 'user and group')
+            os.chmod(temporary_file.name, S_IRWXU + S_IRWXG)
+            return temporary_file
+        else:
+            temporary_file = NamedTemporaryFile("r+b", prefix=prefix, suffix=suffix)
+            return temporary_file
+
 
 class ImagesizatorTemporaryFile(ImagesizatorFile):
     expiration_date = models.DateTimeField(
@@ -164,41 +180,35 @@ class ImagesizatorTemporaryFile(ImagesizatorFile):
     def __str__(self):
         return self.path
 
-    def save(self, seconds=86400, *args, **kwargs):
-        self.created_at = timezone_now()
+    def save(self, decoded_file, suffix, seconds=86400, *args, **kwargs):
         seconds = int(seconds)
         self.expiration_date = self.created_at + timedelta(seconds=seconds)
-        super().save(*args, **kwargs)
+        super().save(
+            decoded_file=decoded_file,
+            suffix=suffix,
+            publish_path=self.publish_path,
+            *args,
+            **kwargs
+        )
 
     save.alters_data = True
 
-    def get_publish_file_path(self):
+    @property
+    def publish_path(self):
+        path = os.getcwd()
         if self.is_protected:
-            path = settings.PROTECTED_FOLDER + "/temp"
+            path += settings.PROTECTED_FOLDER + "/temp"
         else:
-            path = settings.PUBLIC_FOLDER + "/temp"
+            path += settings.PUBLIC_FOLDER + "/temp"
         return path
-
-    def get_named_temporary_file(self, prefix, suffix, publish=False):
-        if publish:
-            # Return file public url
-            publish_path = os.getcwd() + self.get_publish_file_path()
-
-            temporary_file = NamedTemporaryFile(
-                "r+b",
-                prefix=prefix,
-                suffix=suffix,
-                dir=publish_path,
-                delete=False
-            )
-
-            # chmod 770 (Grant rwx access to www-data.www-data 'user and group')
-            os.chmod(temporary_file.name, S_IRWXU + S_IRWXG)
-            return temporary_file
-        else:
-            temporary_file = NamedTemporaryFile("r+b", prefix=prefix, suffix=suffix)
-
-            return temporary_file
+    
+    @property
+    def is_temporal(self):
+        return True
+    
+    @property
+    def is_static(self):
+        return False
 
     @staticmethod
     def get_file_expiration_date(expiration=60*60*24):
@@ -216,6 +226,7 @@ class ImagesizatorTemporaryFile(ImagesizatorFile):
 
         return expiration
 
+
 class ImagesizatorStaticFile(ImagesizatorFile):
 
     class Meta:
@@ -225,12 +236,28 @@ class ImagesizatorStaticFile(ImagesizatorFile):
     def __str__(self):
         return self.path
 
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
+    def save(self, decoded_file, suffix, *args, **kwargs):
+        super().save(
+            decoded_file=decoded_file,
+            suffix=suffix,
+            publish_path=self.publish_path,
+            *args,
+            **kwargs
+        )
 
     save.alters_data = True
 
-    def get_publish_file_path(self):
+    @property
+    def is_temporal(self):
+        return False
+    
+    @property
+    def is_static(self):
+        return True
+
+    @property
+    def publish_path(self):
+        path = os.getcwd()
         if self.is_protected:
             path = settings.PROTECTED_FOLDER + "/static"
         else:

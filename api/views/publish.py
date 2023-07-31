@@ -10,7 +10,7 @@ from api.common.utils.api_functions import \
     get_named_temporary_file, \
     get_parameter_value, \
     get_publish_file_path
-from api.models import ImagesizatorTemporaryFile, ImagesizatorFile
+from api.models import ImagesizatorTemporaryFile, ImagesizatorFile, ImagesizatorStaticFile
 
 
 # User must be logged to use this endpoint.
@@ -111,3 +111,67 @@ class browserFileViewer(RetrieveAPIView):
             print("Error (pdf_viewer):", e)
 
         return HttpResponse("Error", status=500)
+    
+
+# ######################################################################
+# ###################### API V1.1 ######################################
+# ######################################################################
+# Endpoints used since version 1.1 of Imagesizator
+
+# User must be logged to use this endpoint.
+# Use 'Authorization: Token the_token' header.
+class NewPublishFile(RetrieveAPIView):
+    """
+    Publish any type of file without modifications.
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, protected="public", static="temp", *args, **kwargs):
+        response_data = {"error": "api_error"}
+        response_code = 500
+
+        try:
+            # Get POST data
+            # action = request.data["action"] - NOT USED YET -
+            suffix = request.data["suffix"]
+
+            # bytes file in format: base64.b64encode(file).decode('utf8')
+            decoded_file = base64.b64decode(request.data["file"])
+
+            is_protected = bool(protected == "protected")
+            is_static = bool(static == "static")
+
+            published_file = None
+            if is_static:
+                # STATIC FILE
+                published_file = ImagesizatorStaticFile(
+                    is_protected=is_protected,
+                    bytes_string=request.data["file"],
+                )
+                published_file.save(
+                    decoded_file=decoded_file,
+                    suffix=suffix,
+                )
+            else:
+                # TEMP FILE
+                published_file = ImagesizatorTemporaryFile(
+                    is_protected=is_protected,
+                    bytes_string=request.data["file"],
+                )
+                published_file.save(
+                    decoded_file=decoded_file,
+                    suffix=suffix,
+                    seconds=request.data["expiration"]
+                )
+
+            response_data = {
+                'status': 'published',
+                'suffix': suffix,
+                'file': published_file.url,
+            }
+            response_code = 200
+
+        except Exception as e:
+            print(e)
+
+        return JsonResponse(response_data, status=response_code)
