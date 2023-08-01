@@ -109,14 +109,16 @@ class ImagesizatorFile(models.Model):
         return file_url
 
     def save(self, decoded_file, suffix, publish_path, *args, **kwargs):
-        any_type_file = self.get_named_temporary_file(
-            suffix,
-            publish_path,
-            'file_' + suffix.replace(".", "") + "_",
-        )
-        any_type_file.write(decoded_file)
-        self.path = str(any_type_file.name)
-        any_type_file.close()
+        if not self.path:
+            any_type_file = self.get_named_temporary_file(
+                suffix,
+                publish_path,
+                'file_' + suffix.replace(".", "") + "_",
+            )
+            any_type_file.write(decoded_file)
+            self.path = str(any_type_file.name)
+            any_type_file.close()
+  
         super().save(*args, **kwargs)
 
     save.alters_data = True
@@ -180,7 +182,7 @@ class ImagesizatorTemporaryFile(ImagesizatorFile):
     def __str__(self):
         return self.path
 
-    def save(self, decoded_file, suffix, seconds=86400, *args, **kwargs):
+    def save(self, suffix, decoded_file, seconds=86400, *args, **kwargs):
         seconds = int(seconds)
         self.expiration_date = self.created_at + timedelta(seconds=seconds)
         super().save(
