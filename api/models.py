@@ -108,28 +108,6 @@ class ImagesizatorFile(models.Model):
         file_url += self.path
         return file_url
 
-    def save(self, decoded_file, suffix, publish_path, *args, **kwargs):
-        if not self.path:
-            any_type_file = self.get_named_temporary_file(
-                suffix,
-                publish_path,
-                'file_' + suffix.replace(".", "") + "_",
-            )
-            any_type_file.write(decoded_file)
-            self.path = str(any_type_file.name)
-            any_type_file.close()
-  
-        super().save(*args, **kwargs)
-
-    save.alters_data = True
-
-    def delete(self):
-        try:
-            os.remove(r"" + str(self.path))
-            super(ImagesizatorFile, self).delete()
-        except Exception as e:
-            print(e)
-    
     @staticmethod
     def get_final_image_width_and_height(o_width, o_height, to_width, to_height, keep_proportion='none'):
         """
@@ -165,6 +143,28 @@ class ImagesizatorFile(models.Model):
         else:
             temporary_file = NamedTemporaryFile("r+b", prefix=prefix, suffix=suffix)
             return temporary_file
+
+    def save(self, decoded_file, suffix, publish_path, *args, **kwargs):
+        if not self.path:
+            any_type_file = self.get_named_temporary_file(
+                suffix,
+                publish_path,
+                'file_' + suffix.replace(".", "") + "_",
+            )
+            any_type_file.write(decoded_file)
+            self.path = str(any_type_file.name)
+            any_type_file.close()
+  
+        super().save(*args, **kwargs)
+
+    save.alters_data = True
+
+    def delete(self):
+        try:
+            os.remove(r"" + str(self.path))
+            super(ImagesizatorFile, self).delete()
+        except Exception as e:
+            print(e)
 
 
 class ImagesizatorTemporaryFile(ImagesizatorFile):

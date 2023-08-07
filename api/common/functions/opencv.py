@@ -7,6 +7,8 @@ from api.common.utils.api_functions import \
     get_named_temporary_file, \
     get_final_image_width_and_height
 
+from api.models import ImagesizatorFile
+
 
 def opencv_image_resize(publish, temporal, image, to_width, to_height, keep_proportion, suffix):
 
@@ -47,7 +49,7 @@ def opencv_image_resize(publish, temporal, image, to_width, to_height, keep_prop
 
 
 # Since Imagesizator V1.1
-def new_opencv_image_resize(publish, temporal, image, to_width, to_height, keep_proportion, suffix):
+def new_opencv_image_resize(image, to_width, to_height, suffix, keep_proportion):
 
     string_image = False
     # Need to save the image from request because cv2.imread only works with a path
@@ -70,11 +72,9 @@ def new_opencv_image_resize(publish, temporal, image, to_width, to_height, keep_
         # use of processed_image.tobytes() and avoid save the file also failed (memory buffer).
         # TODO: check if there is a faster way.
 
-        resized_image_file = get_named_temporary_file(
+        resized_image_file = ImagesizatorFile.get_named_temporary_file(
             'ocv_resized_',
             suffix,
-            publish,
-            temporal
         )
         cv2.imwrite(resized_image_file.name, processed_image)
 

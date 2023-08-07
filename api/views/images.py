@@ -4,7 +4,8 @@ from django.http import JsonResponse
 from rest_framework.generics import RetrieveAPIView
 from rest_framework import permissions
 
-from api.models import ImagesizatorTemporaryFile, ImagesizatorStaticFile, ImagesizatorFile
+from api.models.core import ImagesizatorFile
+from api.models.imagesizator_image_file import ImagesizatorImageFile
 from api.common.functions.opencv import opencv_image_resize, new_opencv_image_resize
 from api.common.functions.pillow import pillow_image_resize
 from api.common.utils.api_functions import \
@@ -29,7 +30,7 @@ class ImageResizeView(RetrieveAPIView):
             to_height = int(request.data["to_height"])
             suffix = request.data["suffix"]
 
-            # bytes image in format: base64.b64encode(image).decode('utf8')
+            # 'image' is in format: base64.b64encode(image).decode('utf8')
             image = base64.b64decode(request.data["image"])
 
             # publish the image or send string back?
@@ -74,16 +75,21 @@ class ImageResizeView(RetrieveAPIView):
             # Create an entry for the file created
             if temporal:
                 # as temporal
-                imagesizator_temporary_file = ImagesizatorTemporaryFile(
+                imagesizator_temporary_file = ImagesizatorFile(
                     path=str(resized_image_file.name),
                     bytes_string=string_image,
+                    is_static=False,
+                    is_protected=False
                 )
-                imagesizator_temporary_file.save(seconds=get_file_expiration_date(request))
+                imagesizator_temporary_file.set_file_expiration_date(seconds=int(request.data['expiration']))
+                imagesizator_temporary_file.save()
             else:
                 # as static file
                 imagesizator_file = ImagesizatorFile(
                     path=str(resized_image_file.name),
                     bytes_string=string_image,
+                    is_static=True,
+                    is_protected=False,
                 )
                 imagesizator_file.save()
 
@@ -135,13 +141,12 @@ class NewPublishImageResizeView(RetrieveAPIView):
 
         try:
             # Get POST data
-            # action = request.data["action"] - NOT USED YET -
             to_width = int(request.data["to_width"])
             to_height = int(request.data["to_height"])
             suffix = request.data["suffix"]
 
-            # bytes image in format: base64.b64encode(image).decode('utf8')
-            decoded_image = base64.b64decode(request.data["file"])
+            # 'file' is in format: base64.b64encode(image).decode('utf8')
+            decoded_file = base64.b64decode(request.data["file"])
 
             is_protected = bool(protected == "protected")
             is_static = bool(static == "static")
@@ -152,108 +157,47 @@ class NewPublishImageResizeView(RetrieveAPIView):
             except Exception:
                 print("Parameter keep_proportion missed.")
 
-            resized_image_file = None
-            string_image = None
-            if service == "opencv":
-                resized_image_file, string_image, final_w_h = new_opencv_image_resize(
-                    publish,
-                    temporal,
-                    decoded_image,
-                    to_width,
-                    to_height,
-                    keep_proportion,
-                    suffix
-                )
-            
-            if service == "pillow":
-                resized_image_file, string_image, final_w_h = pillow_image_resize(
-                    publish,
-                    temporal,
-                    decoded_image,
-                    to_width,
-                    to_height,
-                    keep_proportion,
-                    suffix
-                )
-
-            if is_static:
-                # STATIC FILE
-                published_file = ImagesizatorStaticFile(
-                    is_protected=is_protected,
-                    bytes_string=string_image,
-                )
-                published_file.save(
-                    decoded_file=string_image,
-                    suffix=suffix,
-                )
-            else:
-                # TEMP FILE
-                published_file = ImagesizatorTemporaryFile(
-                    is_protected=is_protected,
-                    bytes_string=string_image,
-                )
-                published_file.save(
-                    decoded_file=string_image,
-                    suffix=suffix,
-                    seconds=request.data["expiration"]
-                )
-
-
-            # publish the image or send string back?
-            publish = False
-            temporal = False
+            expiration = 'none'
             try:
-                publish = True if request.data["publish"] == 'yes' else False
-                temporal = True if request.data["temporal"] == 'yes' else False
-            except Exception as e:
-                print(e)
+                expiration = request.data["expiration"] if request.data["expiration"] else "none"
+            except Exception:
+                print("Parameter expiration missed.")
 
+            image_file = ImagesizatorImageFile(
+                is_protected=is_protected,
+                is_static=is_static,
+                bytes_string=decoded_file,
+                suffix=suffix
+            )
 
+            if image_file.is_temporal:
+                image_file.set_file_expiration_date(expiration)
 
-
-
-            # Create an entry for the file created
-            if temporal:
-                # as temporal
-                imagesizator_temporary_file = ImagesizatorTemporaryFile(
-                    path=str(resized_image_file.name),
-                    bytes_string=string_image,
+            if service == "opencv":
+                image_file.opencv_image_resize(
+                    to_width,
+                    to_height,
+                    suffix,
+                    keep_proportion
                 )
-                imagesizator_temporary_file.save(seconds=get_file_expiration_date(request))
-            else:
-                # as static file
-                imagesizator_file = ImagesizatorFile(
-                    path=str(resized_image_file.name),
-                    bytes_string=string_image,
+            elif service == "pillow":
+                image_file.pillow_image_resize(
+                    to_width,
+                    to_height,
+                    suffix,
+                    keep_proportion
                 )
-                imagesizator_file.save()
 
+            image_file.save()
             response_code = 200
-            if publish:
-                publish_url = get_publish_file_path(temporal)
-                image_url = get_parameter_value('imagesizator_domain')
-                image_url += publish_url + resized_image_file.name.split('/')[-1]
-
-                response_data = {
-                    'status': 'resized',
-                    'width': final_w_h[0],
-                    'height': final_w_h[1],
-                    'suffix': suffix,
-                    'image': image_url,
-                }
-            else:
-                # Return image as string
-                response_data = {
-                    'status': 'resized',
-                    'width': final_w_h[0],
-                    'height': final_w_h[1],
-                    'suffix': suffix,
-                    'image': string_image,
-                }
+            response_data = {
+                'status': 'resized',
+                'width': image_file.width,
+                'height': image_file.height,
+                'suffix': image_file.suffix,
+                'image': image_file.url,
+            }
         except Exception as e:
             print(e)
-
-        # TODO: check if it is possible to close (and then delete) files asynchonously
-        resized_image_file.close()
 
         return JsonResponse(response_data, status=response_code)
