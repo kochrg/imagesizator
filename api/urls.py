@@ -42,17 +42,11 @@ urlpatterns += [
 
 # API V-1.1
 urlpatterns += [
-    # Work with an image service and publish the result
+    # Work with an image service and publish/retrieve the result
     path(
-        "publish/image/<service>/<protected>/<static>",
-        api.NewPublishImageResizeView.as_view(),
-        name="new-image-resize-publish"
-    ),
-    # Work with an image service and retrieve the result
-    path(
-        "retrieve/image/<service>/<protected>/<static>",
-        api.NewImageResizeView.as_view(),
-        name="new-image-resize-retrieve"
+        "<action>/image/<service>/<protected>/<static>",
+        api.PublishRetrieveImageResizeView.as_view(),
+        name="new-image-resize-publish-retrieve"
     ),
     # Publish any type of file without modifications
     path(

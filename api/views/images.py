@@ -6,12 +6,11 @@ from rest_framework import permissions
 
 from api.models.core import ImagesizatorFile
 from api.models.imagesizator_image_file import ImagesizatorImageFile
-from api.common.functions.opencv import opencv_image_resize, new_opencv_image_resize
+from api.common.functions.opencv import opencv_image_resize
 from api.common.functions.pillow import pillow_image_resize
 from api.common.utils.api_functions import \
     get_parameter_value, \
-    get_publish_file_path, \
-    get_file_expiration_date
+    get_publish_file_path
 
 
 # User must be logged to use this endpoint.
@@ -132,10 +131,10 @@ class ImageResizeView(RetrieveAPIView):
 
 # User must be logged to use this endpoint.
 # Use 'Authorization: Token the_token' header.
-class NewPublishImageResizeView(RetrieveAPIView):
+class PublishRetrieveImageResizeView(RetrieveAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
-    def post(self, request, service,  protected="public", static="temp", *args, **kwargs):
+    def post(self, request, action, service,  protected="public", static="temp", *args, **kwargs):
         response_data = {"error": "api_error"}
         response_code = 500
 
@@ -195,8 +194,11 @@ class NewPublishImageResizeView(RetrieveAPIView):
                 'width': image_file.width,
                 'height': image_file.height,
                 'suffix': image_file.suffix,
-                'image': image_file.url,
+                'image_url': image_file.url,
             }
+            if action == 'retrieve':
+                response_data['bytes_string'] = image_file.bytes_string
+
         except Exception as e:
             print(e)
 
