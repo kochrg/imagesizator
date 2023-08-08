@@ -10,7 +10,7 @@ from api.common.utils.api_functions import \
     get_named_temporary_file, \
     get_parameter_value, \
     get_publish_file_path
-from api.models import ImagesizatorTemporaryFile, ImagesizatorFile, ImagesizatorStaticFile
+from api.models.core import ImagesizatorFile
 
 
 # User must be logged to use this endpoint.
@@ -46,13 +46,15 @@ class PublishFile(RetrieveAPIView):
 
             # Create an entry for the file created
             if temporal:
-                imagesizator_temporary_file = ImagesizatorTemporaryFile(
+                imagesizator_temporary_file = ImagesizatorFile(
+                    is_static=False,
                     path=str(any_type_file.name),
                     bytes_string=request.data["file"],
                 )
                 imagesizator_temporary_file.save(seconds=get_file_expiration_date(request))
             else:
                 imagesizator_file = ImagesizatorFile(
+                    is_static=True,
                     path=str(any_type_file.name),
                     bytes_string=request.data["file"],
                 )
@@ -141,33 +143,19 @@ class NewPublishFile(RetrieveAPIView):
             is_protected = bool(protected == "protected")
             is_static = bool(static == "static")
 
-            published_file = None
-            if is_static:
-                # STATIC FILE
-                published_file = ImagesizatorStaticFile(
-                    is_protected=is_protected,
-                    bytes_string=request.data["file"],
-                )
-                published_file.save(
-                    decoded_file=decoded_file,
-                    suffix=suffix,
-                )
-            else:
-                # TEMP FILE
-                published_file = ImagesizatorTemporaryFile(
-                    is_protected=is_protected,
-                    bytes_string=request.data["file"],
-                )
-                published_file.save(
-                    decoded_file=decoded_file,
-                    suffix=suffix,
-                    seconds=request.data["expiration"]
-                )
+            imagesizator_file = ImagesizatorFile(
+                is_protected=is_protected,
+                is_static=is_static,
+                bytes_string=decoded_file,
+                suffix=suffix
+            )
+
+            imagesizator_file.save()
 
             response_data = {
                 'status': 'published',
                 'suffix': suffix,
-                'file': published_file.url,
+                'file_url': imagesizator_file.url,
             }
             response_code = 200
 

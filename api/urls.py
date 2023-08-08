@@ -15,12 +15,6 @@ urlpatterns = [
 
 # API V-1.0
 urlpatterns += [
-    # PDF
-    path(
-        "images/pdf/publish",
-        api.PublishPDFFile.as_view(),
-        name="publish-pdf-file"
-    ),
     # Images
     path(
         "images/viewer/",

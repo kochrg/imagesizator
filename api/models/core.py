@@ -1,6 +1,6 @@
 import os
 
-from datetime import timedelta
+from datetime import timedelta, datetime
 from django.conf import settings
 from django.db import models
 from django.db.models.signals import post_save
@@ -75,6 +75,10 @@ class Parameters(models.Model):
 
 class ImagesizatorFile(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
+    file_name = models.CharField(
+        max_length=100,
+        null=False
+    )
     path = models.TextField(
         null=False,
         blank=False,
@@ -119,25 +123,22 @@ class ImagesizatorFile(models.Model):
 
     @property
     def url(self):
-        file_url = Parameters.get_parameter_value('imagesizator_domain')
-        if file_url[:-1] != "/":
-            file_url += "/"
-        file_url += self.path
-        return file_url
+        file_url = Parameters.get_parameter_value('imagesizator_domain') + "/"
+        return  file_url + self.publish_path + self.file_name
 
     @property
     def publish_path(self):
-        path = os.getcwd()
+        path = ""
         if self.is_protected:
             if self.is_temporal:
-                path += settings.PROTECTED_FOLDER + "/temp"
+                path += settings.PROTECTED_FOLDER + "/temp/"
             else:
-                path = settings.PROTECTED_FOLDER + "/static"
+                path = settings.PROTECTED_FOLDER + "/static/"
         else:
             if self.is_temporal:
-                path += settings.PUBLIC_FOLDER + "/temp"
+                path += settings.PUBLIC_FOLDER + "/temp/"
             else:
-                path = settings.PUBLIC_FOLDER + "/static"
+                path = settings.PUBLIC_FOLDER + "/static/"
         return path
 
     @property
@@ -156,25 +157,29 @@ class ImagesizatorFile(models.Model):
         # chmod 770 (Grant rwx access to www-data.www-data 'user and group')
         os.chmod(temporary_file.name, S_IRWXU + S_IRWXG)
         self.path = temporary_file.name
+        self.file_name = temporary_file.name.split("/")[-1]
+        self.prefix = prefix
         self.suffix
         return temporary_file
 
     def set_file_expiration_date(self, expiration=None):
         # expiration = 60*60*24. Default: 24hs.
+        seconds = expiration
         try:
-            if expiration is None:
+            if seconds is None:
                 # Custom defaul_expiration_time in config?
                 user_default = int(Parameters.get_parameter_value('default_expiration_time'))  # seconds
                 if user_default:
-                    expiration = user_default
+                    seconds = user_default
                 else:
-                    expiration = 60*60*24
+                    seconds = 60*60*24
             # else: use expiration from parameter (default)
         except Exception as e:
             pass
 
-        seconds = int(expiration)
-        self.expiration_date = self.created_at + timedelta(seconds=seconds)
+        if not self.created_at:
+            self.created_at = datetime.now()
+        self.expiration_date = self.created_at + timedelta(seconds=int(seconds))
 
         return self.expiration_date
 
@@ -189,7 +194,6 @@ class ImagesizatorFile(models.Model):
         if not self.path:
             any_type_file = self.set_named_temporary_file(
                 self.suffix,
-                self.publish_path,
                 'file_' + self.suffix.replace(".", "") + "_",
             )
             any_type_file.write(self.bytes_string)
