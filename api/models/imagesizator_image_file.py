@@ -3,6 +3,7 @@ import cv2
 
 from django.db import models
 from django.core.files.base import ContentFile
+from django.conf import settings
 from tempfile import NamedTemporaryFile
 from PIL import Image
 
@@ -56,10 +57,11 @@ class ImagesizatorImageFile(ImagesizatorFile):
 
     def opencv_image_resize(self, to_width, to_height, suffix, keep_proportion='none'):
         # Need to save the image from request because cv2.imread only works with a path
-        with NamedTemporaryFile("wb", suffix=suffix) as f:
+        with NamedTemporaryFile("wb", prefix="ocv_img_temp_file_", dir=settings.TRASH_FOLDER, suffix=suffix) as f:
+            print("Before write")
             f.write(self.bytes_string)
             processed_image = cv2.imread(f.name)
-            
+            print("Image read")
             final_w_h = self.set_final_image_width_and_height(
                 processed_image.shape[1],  # original width
                 processed_image.shape[0],  # original height
@@ -67,6 +69,7 @@ class ImagesizatorImageFile(ImagesizatorFile):
                 to_height,
                 keep_proportion
             )
+            print("Resizing")
             processed_image = cv2.resize(processed_image, final_w_h)
 
             # Saving resized image to a temporal file and make it public
@@ -76,11 +79,13 @@ class ImagesizatorImageFile(ImagesizatorFile):
             # TODO: check if there is a faster way.
 
             resized_image_file = self.set_named_temporary_file(
-                'ocv_resized_',
                 suffix,
+                'ocv_resized_',
             )
+            print("Writing image to new file")
             cv2.imwrite(resized_image_file.name, processed_image)
 
+            print("Configuring bytes_string")
             self.bytes_string = resized_image_file.read()
             f.close()
 

@@ -17,11 +17,6 @@ urlpatterns = [
 urlpatterns += [
     # Images
     path(
-        "images/viewer/",
-        api.browserFileViewer.as_view(),
-        name="publish-file-in-browser-viewer"
-    ),
-    path(
         "images/<service>",
         api.ImageResizeView.as_view(),
         name="image-resize"
@@ -48,4 +43,10 @@ urlpatterns += [
         api.NewPublishFile.as_view(),
         name="new-publish-file"
     ),
+    # Accessing files
+    path(
+        "www/public/<folder>/<file_name>",
+        api.PublicBrowserFileViewer.as_view(),
+        name="public-browser-file-viewer"
+    )
 ]
