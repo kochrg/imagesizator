@@ -1,12 +1,13 @@
 from django.utils.timezone import now as timezone_now
 
-from api.models import ImagesizatorTemporaryFile
+from api.models.core import ImagesizatorFile
 
 
 def delete_expired_files():
     try:
-        files_query = ImagesizatorTemporaryFile.objects.filter(
-            expiration_date__lt=timezone_now()
+        files_query = ImagesizatorFile.objects.filter(
+            expiration_date__lt=timezone_now(),
+            is_static=False
         )
 
         for file in files_query:

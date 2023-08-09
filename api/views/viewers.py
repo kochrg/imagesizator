@@ -15,7 +15,8 @@ class PublicBrowserFileViewer(RetrieveAPIView):
         try:
 
             imagesizator_file = ImagesizatorFile.objects.get(
-                file_name=file_name
+                file_name=file_name,
+                is_static=bool(folder == 'static')
             )
 
             if ('public/' + folder) in imagesizator_file.path:
@@ -34,34 +35,41 @@ class PublicBrowserFileViewer(RetrieveAPIView):
 class ProtectedBrowserFileViewer(RetrieveAPIView):
     permission_classes = []
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request, folder, file_name, token, *args, **kwargs):
         """
         Return a FileResponse to open the file in a web browser
         """
         try:
-            # path could be the entire url returned by an imagesizator endpoint
-            # or a path, starting from public. I. e.: public/temp/name_of_file
-            url = request.GET['path']
-            token = request.GET['token']
-
             # Check if it is a valid token
             token_query = Token.objects.filter(key=token)
             if token == None or not token_query.exists():
                 return HttpResponse("Forbidden", status=403)
 
-            # Get POST datadef pdf_view(request):
-            if not url:
-                return HttpResponse("Not Found", status=404)
+            imagesizator_file = ImagesizatorFile.objects.get(
+                file_name=file_name,
+                is_static=bool(folder == 'static')
+            )
 
-            url_args = url.split("/")
-            file_path = url_args[-3] + "/" + url_args[-2] + "/" + url_args[-1]
+            if ('protected/' + folder) in imagesizator_file.path:
+                file = open(imagesizator_file.path, 'rb')
+                response = FileResponse(file)
 
-            file = open(file_path, 'rb')
-
-            response = FileResponse(file)
-
-            return response
+                return response
+        except ImagesizatorFile.DoesNotExist:
+            return HttpResponse("Not Found", status=404)
         except Exception as e:
-            print("Error (pdf_viewer):", e)
+            print("Error (Protected browser viewer):", e)
 
         return HttpResponse("Error", status=500)
+
+
+class UnsecureProtectedBrowserFileViewer(RetrieveAPIView):
+    permission_classes = []
+
+    def get(self, request, *args, **kwargs):
+        """
+        Accessing protected file without token.
+        Return forbidden.
+        """
+
+        return HttpResponse("Forbidden", status=403)

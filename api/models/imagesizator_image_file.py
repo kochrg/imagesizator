@@ -112,8 +112,8 @@ class ImagesizatorImageFile(ImagesizatorFile):
         # TODO: check if there is a faster way.
 
         resized_image_file = self.set_named_temporary_file(
-            'pil_resized_',
             suffix,
+            'pil_resized_',
         )
         image_thumbnail.save(resized_image_file.name)
 
