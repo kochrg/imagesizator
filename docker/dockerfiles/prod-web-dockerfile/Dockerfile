@@ -38,7 +38,7 @@ RUN mkdir -p www logs www/public www/public/static www/public/temp
 RUN mkdir -p www/protected www/protected/static www/protected/temp
 VOLUME ["$DOCKYARD_SRVHOME/logs/"]
 
-ADD docker-entrypoint.sh /
+ADD docker/dockerfiles/prod-web-dockerfile/docker-entrypoint.sh /
 
 RUN mkdir $DOCKYARD_SRVPROJ
 ADD requirements.txt $DOCKYARD_SRVPROJ/
@@ -85,7 +85,7 @@ WORKDIR $DOCKYARD_SRVPROJ
 RUN python manage.py collectstatic --noinput
 
 # Copy entrypoint script into the image
-COPY --from=builder /docker-entrypoint.sh ./
+COPY --from=builder docker-entrypoint.sh ./
 
 RUN ["chmod", "+x", "./docker-entrypoint.sh"]
 

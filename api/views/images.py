@@ -158,11 +158,10 @@ class PublishRetrieveImageResizeView(RetrieveAPIView):
 
             expiration = 'none'
             try:
-                expiration = request.data["expiration"] if request.data["expiration"] else "none"
+                expiration = request.data["expiration"] if request.data["expiration"] else None
             except Exception:
                 print("Parameter expiration missed.")
 
-            print("Creating imagesizator file")
             image_file = ImagesizatorImageFile(
                 is_protected=is_protected,
                 is_static=is_static,
@@ -170,19 +169,16 @@ class PublishRetrieveImageResizeView(RetrieveAPIView):
                 suffix=suffix
             )
 
-            print("Setting expiration_date")
             if image_file.is_temporal:
                 image_file.set_file_expiration_date(expiration)
 
             if service == "opencv":
-                print("Starting resize")
                 image_file.opencv_image_resize(
                     to_width,
                     to_height,
                     suffix,
                     keep_proportion
                 )
-                print("Resize successfull")
             elif service == "pillow":
                 image_file.pillow_image_resize(
                     to_width,

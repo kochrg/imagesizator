@@ -114,6 +114,12 @@ class NewPublishFile(RetrieveAPIView):
                 suffix=suffix
             )
 
+            if not is_static:
+                # Temp file: look for expiration
+                seconds = int(request.data.get("expiration", 0))
+                if seconds > 0:
+                    imagesizator_file.set_file_expiration_date(seconds)
+
             imagesizator_file.save()
 
             response_data = {

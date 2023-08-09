@@ -23,6 +23,7 @@ class ImagesizatorFileAdmin(admin.ModelAdmin):
     ordering = ('-created_at',)
     list_display_links = ('path',)
     actions = ['delete_model', 'delete_queryset']
+    readonly_fields = ['expiration_date']
 
     def delete_queryset(self, request, queryset):
         for obj in queryset:

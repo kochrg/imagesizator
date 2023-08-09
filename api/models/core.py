@@ -1,6 +1,6 @@
 import os
 
-from datetime import timedelta, datetime
+from datetime import timedelta
 from django.conf import settings
 from django.db import models
 from django.db.models.signals import post_save
@@ -178,7 +178,7 @@ class ImagesizatorFile(models.Model):
             pass
 
         if not self.created_at:
-            self.created_at = datetime.now()
+            self.created_at = timezone_now()
         self.expiration_date = self.created_at + timedelta(seconds=int(seconds))
 
         return self.expiration_date
@@ -186,9 +186,9 @@ class ImagesizatorFile(models.Model):
     def delete(self):
         try:
             os.remove(r"" + str(self.path))
-            super(ImagesizatorFile, self).delete()
         except Exception as e:
             print(e)
+        super(ImagesizatorFile, self).delete()
 
     def save(self, *args, **kwargs):
         if not self.path:

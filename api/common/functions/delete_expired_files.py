@@ -5,12 +5,14 @@ from api.models.core import ImagesizatorFile
 
 def delete_expired_files():
     try:
+        print("before query")
         files_query = ImagesizatorFile.objects.filter(
             expiration_date__lt=timezone_now(),
             is_static=False
         )
-
+        print ("after query")
         for file in files_query:
+            print("Deleting file:", file.file_name)
             file.delete()
 
         return True
