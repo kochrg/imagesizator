@@ -7,7 +7,7 @@ from django.conf import settings
 from tempfile import NamedTemporaryFile
 from PIL import Image
 
-from api.models.core import Parameters, ImagesizatorFile
+from api.models.core import ImagesizatorFile
 
 
 class ImagesizatorImageFile(ImagesizatorFile):

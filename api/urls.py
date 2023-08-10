@@ -13,22 +13,6 @@ urlpatterns = [
     ),
 ]
 
-# API V-1.0
-urlpatterns += [
-    # Images
-    path(
-        "images/<service>",
-        api.ImageResizeView.as_view(),
-        name="image-resize"
-    ),
-    # Publish any type of file without modifications
-    path(
-        "files/publish",
-        api.PublishFile.as_view(),
-        name="publish-any-file"
-    ),
-]
-
 # API V-1.1
 # action    = publish   | retrieve
 # service   = pillow    | opencv
