@@ -14,7 +14,7 @@ if [ "$CONT_WWW_DATA_GID" != "" ]; then
     # Group www-data exists in container, check if have the same GID
     if [ "$HOST_WWW_DATA_GID" != "$CONT_WWW_DATA_GID" ]; then
         # host www-data GID != container www-data GID, change local GID
-        
+
         # Check if the HOST_WWW_DATA_GID is in use in the container
         if [ "$(getent group $HOST_WWW_DATA_GID | cut -d: -f1)" != "" ]; then
             # GID in use, change the container group GID that have the same GID
@@ -28,7 +28,7 @@ if [ "$CONT_WWW_DATA_GID" != "" ]; then
     fi
 else
     # Group not exists in container, create it with HOST_WWW_DATA_GID
-    
+
     # Check if the HOST_WWW_DATA_GID is in use in the container
     if [ "$(getent group $HOST_WWW_DATA_GID | cut -d: -f1)" != "" ]; then
         # GID in use, change the container group GID that have the same GID

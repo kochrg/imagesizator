@@ -1,4 +1,5 @@
 import os
+import logging
 
 from datetime import timedelta
 from django.conf import settings
@@ -27,7 +28,7 @@ class Parameters(models.Model):
         help_text="Ingrese el nombre del parámetro",
     )
     value = models.TextField(
-        default='',
+        default="",
         help_text="Ingrese el valor del parámetro",
     )
 
@@ -43,14 +44,14 @@ class Parameters(models.Model):
         try:
             parameter = Parameters.objects.get(key=key)
 
-            if parameter.value == 'None':
+            if parameter.value == "None":
                 return None
 
             return parameter.value
         except Parameters.DoesNotExist:
-            print("Error getting parameter: " + str(key))
+            logging.log(1, "Error getting parameter: " + str(key))
         except Exception as e:
-            print("Error (get_aparameter_value):", e)
+            logging.log(1, "Error (get_aparameter_value):", e)
 
         return False
 
@@ -61,52 +62,31 @@ class Parameters(models.Model):
         """
         parameter = Parameters.get_parameter_value(key)
 
-        if parameter is not None:
-            if not parameter:
-                print("Adding parameter:", key)
-                Parameters(
-                    key=key,
-                    value=value
-                ).save()
-                return True
+        if not parameter:
+            logging.log(1, "Adding parameter:", key)
+            Parameters(key=key, value=value).save()
+            return True
 
         return False
 
 
 class ImagesizatorFile(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
-    file_name = models.CharField(
-        max_length=100,
-        null=False
-    )
+    file_name = models.CharField(max_length=100, null=False)
     path = models.TextField(
         null=False,
         blank=False,
         help_text="File path",
     )
-    prefix = models.CharField(
-        max_length=50,
-        null=True
-    )
-    suffix = models.CharField(
-        max_length=10,
-        null=True
-    )
+    prefix = models.CharField(max_length=50, null=True)
+    suffix = models.CharField(max_length=10, null=True)
     # bytes_string = decoded_file = base64.b64decode(request.data["file"])
     bytes_string = models.TextField(
-        default='',
+        default="",
         help_text="Image as a byte string",
     )
-    is_protected = models.BooleanField(
-        null=False,
-        blank=False,
-        default=False
-    )
-    is_static = models.BooleanField(
-        null=False,
-        blank=False,
-        default=False
-    )
+    is_protected = models.BooleanField(null=False, blank=False, default=False)
+    is_static = models.BooleanField(null=False, blank=False, default=False)
     expiration_date = models.DateTimeField(
         "Expiration date (valid until)",
         null=True,
@@ -123,8 +103,8 @@ class ImagesizatorFile(models.Model):
 
     @property
     def url(self):
-        file_url = Parameters.get_parameter_value('imagesizator_domain') + "/"
-        return  file_url + self.publish_path + self.file_name
+        file_url = Parameters.get_parameter_value("imagesizator_domain") + "/"
+        return file_url + self.publish_path + self.file_name
 
     @property
     def publish_path(self):
@@ -145,13 +125,9 @@ class ImagesizatorFile(models.Model):
     def is_temporal(self):
         return not self.is_static
 
-    def set_named_temporary_file(self, suffix, prefix='file_'):
+    def set_named_temporary_file(self, suffix, prefix="file_"):
         temporary_file = NamedTemporaryFile(
-            "r+b",
-            prefix=prefix,
-            suffix=suffix,
-            dir=self.publish_path,
-            delete=False
+            "r+b", prefix=prefix, suffix=suffix, dir=self.publish_path, delete=False
         )
 
         # chmod 770 (Grant rwx access to www-data.www-data 'user and group')
@@ -165,17 +141,19 @@ class ImagesizatorFile(models.Model):
     def set_file_expiration_date(self, expiration=None):
         # expiration = 60*60*24. Default: 24hs.
         seconds = expiration
-        try:
+        try:  # noqa
             if seconds is None:
                 # Custom defaul_expiration_time in config?
-                user_default = int(Parameters.get_parameter_value('default_expiration_time'))  # seconds
+                user_default = int(
+                    Parameters.get_parameter_value("default_expiration_time")
+                )  # seconds
                 if user_default:
                     seconds = user_default
                 else:
-                    seconds = 60*60*24
+                    seconds = 60 * 60 * 24
             # else: use expiration from parameter (default)
-        except Exception as e:
-            pass
+        except Exception:
+            pass  # noqa
 
         if not self.created_at:
             self.created_at = timezone_now()
@@ -187,18 +165,18 @@ class ImagesizatorFile(models.Model):
         try:
             os.remove(r"" + str(self.path))
         except Exception as e:
-            print(e)
+            logging.log(1, e)
         super(ImagesizatorFile, self).delete()
 
     def save(self, *args, **kwargs):
         if not self.path:
             any_type_file = self.set_named_temporary_file(
                 self.suffix,
-                'file_' + self.suffix.replace(".", "") + "_",
+                "file_" + self.suffix.replace(".", "") + "_",
             )
             any_type_file.write(self.bytes_string)
             any_type_file.close()
-  
+
         if self.is_temporal and not self.expiration_date:
             self.set_file_expiration_date()
 

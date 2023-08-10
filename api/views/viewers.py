@@ -1,3 +1,5 @@
+import logging
+
 from django.http import HttpResponse, FileResponse
 from rest_framework.authtoken.models import Token
 from rest_framework.generics import RetrieveAPIView
@@ -15,19 +17,18 @@ class PublicBrowserFileViewer(RetrieveAPIView):
         try:
 
             imagesizator_file = ImagesizatorFile.objects.get(
-                file_name=file_name,
-                is_static=bool(folder == 'static')
+                file_name=file_name, is_static=(folder == "static")
             )
 
-            if ('public/' + folder) in imagesizator_file.path:
-                file = open(imagesizator_file.path, 'rb')
+            if ("public/" + folder) in imagesizator_file.path:
+                file = open(imagesizator_file.path, "rb")  # noqa
                 response = FileResponse(file)
 
                 return response
         except ImagesizatorFile.DoesNotExist:
             return HttpResponse("Not Found", status=404)
         except Exception as e:
-            print("Error (Public browser viewer):", e)
+            logging.log(1, "Error (Public browser viewer):", e)
 
         return HttpResponse("Error", status=500)
 
@@ -42,23 +43,22 @@ class ProtectedBrowserFileViewer(RetrieveAPIView):
         try:
             # Check if it is a valid token
             token_query = Token.objects.filter(key=token)
-            if token == None or not token_query.exists():
+            if token is None or not token_query.exists():
                 return HttpResponse("Forbidden", status=403)
 
             imagesizator_file = ImagesizatorFile.objects.get(
-                file_name=file_name,
-                is_static=bool(folder == 'static')
+                file_name=file_name, is_static=(folder == "static")
             )
 
-            if ('protected/' + folder) in imagesizator_file.path:
-                file = open(imagesizator_file.path, 'rb')
+            if ("protected/" + folder) in imagesizator_file.path:
+                file = open(imagesizator_file.path, "rb")  # noqa
                 response = FileResponse(file)
 
                 return response
         except ImagesizatorFile.DoesNotExist:
             return HttpResponse("Not Found", status=404)
         except Exception as e:
-            print("Error (Protected browser viewer):", e)
+            logging.log(1, "Error (Protected browser viewer):", e)
 
         return HttpResponse("Error", status=500)
 

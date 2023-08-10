@@ -71,9 +71,9 @@ To use your self-signed certificates follow the next steps:
 2. In ``imagesizator.conf`` file, point apache to use your certificates:
 ```
     SSLCertificateFile /etc/apache2/ssl/your_server.crt
-    
+
     SSLCertificateKeyFile /etc/apache2/ssl/your_server.key
-    
+
     SSLCertificateChainFile /etc/apache2/ssl/your_chain.pem
 ```
 
@@ -248,7 +248,7 @@ Slightly faster than opencv.
     "temporal": "yes"/"no",
     "expiration": "seconds",
     "suffix": "the_file_extension",
-    "image": "image_as_string" 
+    "image": "image_as_string"
 }
 ```
 

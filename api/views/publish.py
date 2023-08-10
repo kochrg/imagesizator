@@ -1,4 +1,5 @@
 import base64
+import logging
 
 from django.http import JsonResponse
 from rest_framework.generics import RetrieveAPIView
@@ -18,6 +19,7 @@ class NewPublishFile(RetrieveAPIView):
     """
     Publish any type of file without modifications.
     """
+
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, protected="public", static="temp", *args, **kwargs):
@@ -32,14 +34,14 @@ class NewPublishFile(RetrieveAPIView):
             # bytes file in format: base64.b64encode(file).decode('utf8')
             decoded_file = base64.b64decode(request.data["file"])
 
-            is_protected = bool(protected == "protected")
-            is_static = bool(static == "static")
+            is_protected = protected == "protected"
+            is_static = static == "static"
 
             imagesizator_file = ImagesizatorFile(
                 is_protected=is_protected,
                 is_static=is_static,
                 bytes_string=decoded_file,
-                suffix=suffix
+                suffix=suffix,
             )
 
             if not is_static:
@@ -51,13 +53,13 @@ class NewPublishFile(RetrieveAPIView):
             imagesizator_file.save()
 
             response_data = {
-                'status': 'published',
-                'suffix': suffix,
-                'file_url': imagesizator_file.url,
+                "status": "published",
+                "suffix": suffix,
+                "file_url": imagesizator_file.url,
             }
             response_code = 200
 
         except Exception as e:
-            print(e)
+            logging.log(1, e)
 
         return JsonResponse(response_data, status=response_code)

@@ -1,3 +1,5 @@
+import logging
+
 from django.utils.timezone import now as timezone_now
 
 from api.models.core import ImagesizatorFile
@@ -5,18 +7,17 @@ from api.models.core import ImagesizatorFile
 
 def delete_expired_files():
     try:
-        print("before query")
+        logging.log(1, "before query")
         files_query = ImagesizatorFile.objects.filter(
-            expiration_date__lt=timezone_now(),
-            is_static=False
+            expiration_date__lt=timezone_now(), is_static=False
         )
-        print ("after query")
+        logging.log(1, "after query")
         for file in files_query:
-            print("Deleting file:", file.file_name)
+            logging.log(1, "Deleting file:", file.file_name)
             file.delete()
 
         return True
     except Exception as e:
-        print("Error deleting:", e)
+        logging.log(1, "Error deleting:", e)
 
     return False

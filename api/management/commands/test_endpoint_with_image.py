@@ -1,15 +1,15 @@
-from django.core.management.base import BaseCommand
-
 import base64
 import json
 import requests
 import time
+import logging
+
+from django.core.management.base import BaseCommand
 
 
 # Test endpoint with an image stored in local disk.
 # Useful to test with big images.
 class Command(BaseCommand):
-
     def handle(self, *args, **options):
         try:
             endpoint_uri = input("Enter endpoint URI: ")
@@ -21,7 +21,9 @@ class Command(BaseCommand):
             suffix = input("Enter the image suffix: ")
 
             with open(image_path, "rb") as image_file:
-                image = base64.b64encode(image_file.read()).decode("utf8")  # -> bytes_string
+                image = base64.b64encode(image_file.read()).decode(
+                    "utf8"
+                )  # -> bytes_string
                 data = {
                     "action": action,
                     "to_width": to_width,
@@ -29,12 +31,14 @@ class Command(BaseCommand):
                     "suffix": suffix,
                     "image": image,
                 }
-                headers = {'Authorization': 'Token ' + token}
+                headers = {"Authorization": "Token " + token}
                 start_time = time.time()
                 response = requests.post(endpoint_uri, data=data, headers=headers)
                 end_time = time.time()
-                print(response)
-                print(json.loads(response.text))
-                print("Endpoint execution time: %s seconds" % (end_time - start_time))
+                logging.log(1, response)
+                logging.log(1, json.loads(response.text))
+                logging.log(
+                    1, "Endpoint execution time: %s seconds" % (end_time - start_time)
+                )
         except Exception as e:
-            print(e)
+            logging.log(1, e)

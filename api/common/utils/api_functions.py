@@ -1,4 +1,3 @@
-
 def diff_month(d1, d2):
     # Get months between two dates. D2 <= D1
     if d1 == d2:

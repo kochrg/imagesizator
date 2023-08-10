@@ -9,7 +9,7 @@ urlpatterns = [
     path(
         "scheduler/delete_expired_files",
         api.DeleteExpiredFilesView.as_view(),
-        name="delete-expired-files"
+        name="delete-expired-files",
     ),
 ]
 
@@ -25,28 +25,28 @@ urlpatterns += [
     path(
         "<action>/image/<service>/<protected>/<static>",
         api.PublishRetrieveImageResizeView.as_view(),
-        name="new-image-resize-publish-retrieve"
+        name="new-image-resize-publish-retrieve",
     ),
     # Publish any type of file without modifications
     path(
         "publish/<protected>/<static>",
         api.NewPublishFile.as_view(),
-        name="new-publish-file"
+        name="new-publish-file",
     ),
     # Accessing files
     path(
         "www/public/<folder>/<file_name>",
         api.PublicBrowserFileViewer.as_view(),
-        name="public-browser-file-viewer"
+        name="public-browser-file-viewer",
     ),
     path(
         "www/protected/<folder>/<file_name>",
         api.UnsecureProtectedBrowserFileViewer.as_view(),
-        name="protected-browser-file-viewer"
+        name="protected-browser-file-viewer",
     ),
     path(
         "www/protected/<folder>/<file_name>/<token>",
         api.ProtectedBrowserFileViewer.as_view(),
-        name="protected-browser-file-viewer"
+        name="protected-browser-file-viewer",
     ),
 ]

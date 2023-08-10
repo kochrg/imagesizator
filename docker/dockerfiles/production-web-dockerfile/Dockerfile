@@ -48,7 +48,7 @@ COPY ./docker/dockerfiles/production-web-dockerfile/conf/django/pytest.ini /var/
 COPY ./docker/dockerfiles/production-web-dockerfile/conf/django/asgi.py /var/www/imagesizator/imagesizator/asgi.py
 
 # Copy files for apache deploy working with SigNoz or Open Telemetry monitoring tools.
-# Files otlp_config* are added to imagesizator folder only if they exists. 
+# Files otlp_config* are added to imagesizator folder only if they exists.
 COPY ./docker/dockerfiles/production-web-dockerfile/conf/django/wsgi.py \
      ./docker/dockerfiles/production-web-dockerfile/conf/django/otlp_config* /var/www/imagesizator/imagesizator/
 
