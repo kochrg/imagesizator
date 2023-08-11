@@ -2,11 +2,14 @@ __pycache__/
 db.sqlite3
 *.env
 
-docker/dockerfiles/production-web-dockerfile/conf/ssl/server-certificates/*
-docker/dockerfiles/production-web-dockerfile/conf/imagesizator.conf
+*/protected/temp/*
+*/protected/static/*
+*/public/temp/*
+*/public/static/*
+*/trash/*
 
-public/temp/*
-public/static/*
+local_settings.py
+celerybeat-schedule
 
 ## Never ignore
 !.gitkeep

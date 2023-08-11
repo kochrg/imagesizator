@@ -1,37 +1,33 @@
 from django.contrib import admin
-from api.models import ImagesizatorFile, Parameters, ImagesizatorTemporaryFile
+from api.models.core import ImagesizatorFile, Parameters
 
 
-# Register your models here.
 @admin.register(Parameters)
 class ParametersAdmin(admin.ModelAdmin):
     list_display = (
-        'key',
-        'value',
+        "key",
+        "value",
     )
-    search_fields = ('key', 'value')
-    ordering = ('-created_at',)
-    list_display_links = ('key',)
+    search_fields = ("key", "value")
+    ordering = ("-created_at",)
+    list_display_links = ("key",)
 
 
 @admin.register(ImagesizatorFile)
 class ImagesizatorFileAdmin(admin.ModelAdmin):
     list_display = (
-        'created_at',
-        'path',
+        "created_at",
+        "path",
     )
-    search_fields = ('created_at', 'path')
-    ordering = ('-created_at',)
-    list_display_links = ('path',)
+    search_fields = ("created_at", "path")
+    ordering = ("-created_at",)
+    list_display_links = ("path",)
+    actions = ["delete_model", "delete_queryset"]
+    readonly_fields = ["expiration_date"]
 
+    def delete_queryset(self, request, queryset):
+        for obj in queryset:
+            obj.delete()
 
-@admin.register(ImagesizatorTemporaryFile)
-class ImagesizatorTemporaryFileAdmin(admin.ModelAdmin):
-    list_display = (
-        'created_at',
-        'path',
-        'expiration_date'
-    )
-    search_fields = ('created_at', 'path')
-    ordering = ('-created_at',)
-    list_display_links = ('path',)
+    def delete_model(self, request, obj):
+        obj.delete()
