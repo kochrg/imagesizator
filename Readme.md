@@ -1,7 +1,8 @@
 # Imagesizator
-Imagesizator is a service that can receive images or pdf files through an HTTP or HTTPS url using a bytes-string format, manipulate them, and send you the result. In conclusion, Imagesizator works as an image or file online bucket.
+Imagesizator is a service that can receive images or pdf files through an HTTP or HTTPS url using a bytes-string format, manipulate them, and send you the result.
+In conclusion, Imagesizator works as an **online image or file bucket**.
 
-With Imagesizator, you can:
+Features:
 - Send an image to be resized and get the resulting bytes-string.
 - Send an image to be resized and published on a public or protected URL.
 - Send a file to be published on a public or protected URL.
@@ -76,12 +77,14 @@ chmod 777 ./database/db.sqlite3
 ```
 
 # Building and running the container
-``S_TIME="* * * * *"  # Cron format`` (optional): when you want the deamon looks for expired images and delete it. I. e.: ``"0 0 * * *"`` means *every day at 00:00* (default).
 
 1. Inside *docker/dockerfiles/prod-web-dockerfile* folder, run:
 ```shell
 docker-compose build --build-arg S_TIME="* * * * *" (optional)
 ```
+
+``S_TIME="* * * * *"  # Cron format`` (optional): when you want the deamon looks for expired images and delete it. I. e.: ``"0 0 * * *"`` means *every day at 00:00* (default).
+
 2. Run:
 ```
 docker-compose up -d
