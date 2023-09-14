@@ -1,5 +1,5 @@
 ### STAGE I - BUILD APPLICATION
-FROM python:3.8-slim-buster AS builder
+FROM python:3.8-slim-bullseye AS builder
 
 # Set env variables used in this Dockerfile (add a unique prefix, such as DOCKYARD)
 # Directory in container for all project files
@@ -14,7 +14,7 @@ RUN apt-get update && apt-get install -y \
   libtool \
   pkg-config \
   python3-dev \
-  python-cffi \
+  python3-cffi \
   gcc \
   g++ \
   git \
@@ -56,7 +56,7 @@ COPY requirements.txt ./
 RUN pip install -r requirements.txt
 
 ### STAGE II - RUN APPLICATION
-FROM python:3.8-slim-buster
+FROM python:3.8-slim-bullseye
 
 # Set env variables used in this Dockerfile (add a unique prefix, such as DOCKYARD)
 # Directory in container for all project files
