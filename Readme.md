@@ -119,6 +119,9 @@ More info about SigNoz and Django:
 
 # Endpoints
 
+## Default URL
+http://127.0.0.1 - http://localhost
+
 ## How to get an *image_as_string* in Python
 ```python
 with open(path_to_the_image, "rb") as image_file:
@@ -141,7 +144,7 @@ To run a command from Terminal:
 
 ## Working with images
 
-**Endpoint URI:** ``<action>/image/<service>/<protected>/<static>``
+**Endpoint URI:** ``api/<action>/image/<service>/<protected>/<static>``
 
 **URL Parameters:**
 ```
@@ -183,7 +186,7 @@ static =
 ```
 
 ## Publish files
-**Endpoint URI:** ``publish/<protected>/<static>``
+**Endpoint URI:** ``api/publish/<protected>/<static>``
 
 **URL Parameters:**
 ```
