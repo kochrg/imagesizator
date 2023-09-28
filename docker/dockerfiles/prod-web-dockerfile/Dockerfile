@@ -5,10 +5,11 @@ FROM python:3.8-slim-bullseye AS builder
 # Directory in container for all project files
 ENV DOCKYARD_SRVHOME=/srv
 # Directory in container for project source files
-ENV DOCKYARD_SRVPROJ=/srv/imagesizator
+ENV DOCKYARD_SRVPROJ=/srv/imagesizator_service
 ENV COLUMNS=80
 
 RUN apt-get update && apt-get install -y \
+  nano \
   build-essential \
   autoconf \
   libtool \
@@ -34,6 +35,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # Create application subdirectories
 WORKDIR $DOCKYARD_SRVHOME
+RUN mkdir -p static logs
 RUN mkdir -p www logs www/public www/public/static www/public/temp
 RUN mkdir -p www/protected www/protected/static www/protected/temp
 VOLUME ["$DOCKYARD_SRVHOME/logs/"]
@@ -62,7 +64,7 @@ FROM python:3.8-slim-bullseye
 # Directory in container for all project files
 ENV DOCKYARD_SRVHOME=/srv
 # Directory in container for project source files
-ENV DOCKYARD_SRVPROJ=/srv/imagesizator
+ENV DOCKYARD_SRVPROJ=/srv/imagesizator_service
 ENV COLUMNS=80
 
 RUN apt-get update && apt-get install -y libpq-dev gettext
@@ -83,6 +85,7 @@ WORKDIR $DOCKYARD_SRVPROJ
 
 # RUN python manage.py compilemessages
 RUN python manage.py collectstatic --noinput
+RUN python manage.py initadmin
 
 # Copy entrypoint script into the image
 COPY --from=builder docker-entrypoint.sh ./

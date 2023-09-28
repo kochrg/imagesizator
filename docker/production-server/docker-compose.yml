@@ -6,21 +6,38 @@ services:
     build:
       context: ../../
       dockerfile: ./docker/dockerfiles/prod-web-dockerfile/Dockerfile
-    volumes:
-      - ../../database:/var/www/imagesizator/database
-      - ../../www:/var/www/imagesizator/www
     deploy:
       replicas: 1
       restart_policy:
         condition: on-failure
-    ports:
-      - "8000:8000"
     env_file:
       - ./build_config/.env
     stop_grace_period: 3s
+    volumes:
+      - ../../static:/srv/imagesizator_service/static
+      - ../../www:/srv/imagesizator_service/www
+    ports:
+        - "8000:8000"
     networks:
       static-network:
         ipv4_address: 10.22.26.2
+  nginx:
+    container_name: imagesizator-nginx
+    build:
+      context: ../dockerfiles/nginx
+      dockerfile: Dockerfile
+    image: imagesizator-nginx:v1.0
+    restart: unless-stopped
+    depends_on:
+      - imagesizator-web-server
+    volumes:
+      - ../../static:/srv/imagesizator_service/static
+      - ../../www:/srv/imagesizator_service/www
+    ports:
+        - "80:80"
+    networks:
+      static-network:
+        ipv4_address: 10.22.26.5
   redis-service:
     container_name: redis
     image: redis:latest

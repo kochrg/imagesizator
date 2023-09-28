@@ -8,7 +8,7 @@ from django.db.models.signals import post_save
 from django.utils.timezone import now as timezone_now
 from django.dispatch import receiver
 from rest_framework.authtoken.models import Token
-from stat import S_IRWXG, S_IRWXU
+from stat import S_IRWXG, S_IRWXU, S_IROTH
 from tempfile import NamedTemporaryFile
 
 
@@ -131,7 +131,7 @@ class ImagesizatorFile(models.Model):
         )
 
         # chmod 770 (Grant rwx access to www-data.www-data 'user and group')
-        os.chmod(temporary_file.name, S_IRWXU + S_IRWXG)
+        os.chmod(temporary_file.name, S_IRWXU + S_IRWXG + S_IROTH)
         self.path = temporary_file.name
         self.file_name = temporary_file.name.split("/")[-1]
         self.prefix = prefix

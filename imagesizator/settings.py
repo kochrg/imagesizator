@@ -33,9 +33,13 @@ if ALLOWED_HOSTS:
 else:
     ALLOWED_HOSTS = []
 
+CSRF_TRUSTED_ORIGINS = os.getenv("CSRF_TRUSTED_ORIGINS", "http://*127.0.0.1")
+if CSRF_TRUSTED_ORIGINS:
+    CSRF_TRUSTED_ORIGINS = CSRF_TRUSTED_ORIGINS.split(",")
+else:
+    CSRF_TRUSTED_ORIGINS = []
 
 # Application definition
-
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -140,6 +144,7 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
+
 
 # Imagesizator folders
 PROTECTED_FOLDER = "www/protected"
