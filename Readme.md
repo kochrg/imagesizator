@@ -171,9 +171,10 @@ static =
 **Data:**
 - to_width = "your_width" (integer). Final width of the resized image.
 - to_height = "your_height" (integer). Final height of the resized image.
-- suffix = "the_file_extension" (i. e.: ".jpg") **!important**.
+- suffix = "the_file_extension" (i. e.: ".jpg") **!important using 'image' parameter**.
 - expiration (optional) = "seconds" (integer). The seconds in what the image will be available by url. Only valid when it is combined with *temp* images. Default 24 hs.
 - image = the image as a bytes string.
+- url (optional) = instead of use **image** pass a url to the image. I.e.: https://link_to_the_image.com/image.jpg
 
 ```json
 {
@@ -182,6 +183,17 @@ static =
     "suffix": "the_file_extension",
     "expiration": "seconds",
     "image": "image_as_string",
+}
+```
+
+Or
+
+```json
+{
+    "to_width": "your_width",
+    "to_height": "your_height",
+    "expiration": "seconds",
+    "url": "https://link_to_the_image.com/image.jpg",
 }
 ```
 
@@ -207,11 +219,23 @@ static =
 **Data:**
 - expiration (optional) = "seconds" (integer). The seconds in what the file will be available by url. Only valid when it is combined with *temp* files. Default 24 hs.
 - file = the file as a bytes string.
+- url (optional) = instead of use **file** pass a url to the file. I.e.: https://link_to_the_file.com/file.doc
 
 ```json
 {
     "expiration": "seconds",
     "file": "file_as_string"
+}
+```
+
+Or
+
+```json
+{
+    "to_width": "your_width",
+    "to_height": "your_height",
+    "expiration": "seconds",
+    "url": "https://link_to_the_file.com/file.doc",
 }
 ```
 
