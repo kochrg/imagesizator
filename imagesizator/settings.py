@@ -11,7 +11,6 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 import os
-from django.core.management.utils import get_random_secret_key
 from pathlib import Path
 
 
@@ -22,7 +21,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", default=get_random_secret_key())
+SECRET_KEY = os.getenv(
+    "DJANGO_SECRET_KEY", "_06m))tzs_s#8)*0cm&dk0#n4touf!+hcfi7tsuxhsb&dr$w0$"
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = bool(int(os.getenv("DEBUG", 1)))
@@ -166,6 +167,12 @@ CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL", "redis://localhost:6379"
 CELERY_RESULT_BACKEND = os.environ.get(
     "CELERY_RESULT_BACKEND", "redis://localhost:6379"
 )
+
+
+# User session
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SESSION_COOKIE_AGE = 60 * 60  # 60 Minutos
+SESSION_SAVE_EVERY_REQUEST = True
 
 
 # custom settings for local environment

@@ -230,8 +230,8 @@ For example:
 You need to add the user token to the URL returned in the response.
 For example:
 - with imagesizator service url: http://imagesizator.domain.com
-- returned url: http://imagesizator.domain.com/www/public/*<folder>*/file_name.jpg
-- final url: http://imagesizator.domain.com/www/public/*<folder>*/file_name.jpg/*<token>*
+- returned url: http://imagesizator.domain.com/www/protected/*<folder>*/file_name.jpg
+- final url: http://imagesizator.domain.com/www/protected/*<folder>*/file_name.jpg/*<token>*
 - *<folder>* could be **static** or **temp**
 - *<token>* the token of a registered user
 - copy and paste the URL in a web browser to access the file

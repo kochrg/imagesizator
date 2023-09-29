@@ -16,7 +16,25 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 
+from api import views as api
+
 urlpatterns = [
     path("api/", include("api.urls")),
     path("admin/", admin.site.urls),
+    # Accessing files
+    path(
+        "www/public/<folder>/<file_name>",
+        api.PublicBrowserFileViewer.as_view(),
+        name="public-browser-file-viewer",
+    ),
+    path(
+        "www/protected/<folder>/<file_name>",
+        api.UnsecureProtectedBrowserFileViewer.as_view(),
+        name="protected-browser-file-viewer",
+    ),
+    path(
+        "www/protected/<folder>/<file_name>/<token>",
+        api.ProtectedBrowserFileViewer.as_view(),
+        name="protected-browser-file-viewer",
+    ),
 ]

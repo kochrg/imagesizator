@@ -32,7 +32,6 @@ services:
       - imagesizator-web-server
     volumes:
       - ../../static:/srv/imagesizator_service/static
-      - ../../www:/srv/imagesizator_service/www
     ports:
         - "80:80"
     networks:
