@@ -1,5 +1,6 @@
 import base64
 import logging
+import requests
 
 from django.http import JsonResponse
 from rest_framework.generics import RetrieveAPIView
@@ -36,10 +37,21 @@ class PublishRetrieveImageResizeView(RetrieveAPIView):
             # Get POST data
             to_width = int(request.data["to_width"])
             to_height = int(request.data["to_height"])
-            suffix = request.data["suffix"]
+            suffix = request.data.get("suffix")
 
             # 'file' is in format: base64.b64encode(image).decode('utf8')
-            decoded_file = base64.b64decode(request.data["file"])
+            decoded_file = None
+            if request.data.get("file"):
+                decoded_file = base64.b64decode(request.data["file"])
+            elif request.data.get("url"):
+                if not suffix:
+                    suffix = "." + request.data.get("url").split(".")[-1]
+
+                response = requests.get(request.data.get("url"))
+                decoded_file = response.content
+
+            if not decoded_file:
+                raise Exception
 
             is_protected = protected == "protected"
             is_static = static == "static"

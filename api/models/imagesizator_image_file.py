@@ -104,7 +104,8 @@ class ImagesizatorImageFile(ImagesizatorFile):
             to_height,
             keep_proportion,
         )
-        image_thumbnail.thumbnail(final_w_h)
+
+        image_thumbnail = image_thumbnail.resize(final_w_h, Image.Resampling.LANCZOS)
 
         # Saving resized image to a temporal file
         # NOTE: must be used image_thumbnail.save() as the function used

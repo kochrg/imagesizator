@@ -1,5 +1,6 @@
 import base64
 import logging
+import requests
 
 from django.http import JsonResponse
 from rest_framework.generics import RetrieveAPIView
@@ -29,10 +30,21 @@ class NewPublishFile(RetrieveAPIView):
         try:
             # Get POST data
             # action = request.data["action"] - NOT USED YET -
-            suffix = request.data["suffix"]
+            suffix = request.data.get("suffix")
 
-            # bytes file in format: base64.b64encode(file).decode('utf8')
-            decoded_file = base64.b64decode(request.data["file"])
+            # 'file' is in format: base64.b64encode(image).decode('utf8')
+            decoded_file = None
+            if request.data.get("file"):
+                decoded_file = base64.b64decode(request.data["file"])
+            elif request.data.get("url"):
+                if not suffix:
+                    suffix = "." + request.data.get("url").split(".")[-1]
+                response = requests.get(request.data.get("url"))
+
+                decoded_file = response.content
+
+            if not decoded_file:
+                raise Exception
 
             is_protected = protected == "protected"
             is_static = static == "static"
