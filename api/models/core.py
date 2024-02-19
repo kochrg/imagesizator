@@ -7,6 +7,7 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.utils.timezone import now as timezone_now
 from django.dispatch import receiver
+from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
 from stat import S_IRWXG, S_IRWXU, S_IROTH
 from tempfile import NamedTemporaryFile
@@ -16,6 +17,39 @@ from tempfile import NamedTemporaryFile
 def create_auth_token(sender, instance=None, created=False, **kwargs):
     if created:
         Token.objects.create(user=instance)
+
+
+class TimestampedModel(models.Model):
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+    )
+    updated_at = models.DateTimeField(
+        auto_now=True,
+    )
+    created_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name="created_%(class)s",
+    )
+    updated_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name="updated_%(class)s",
+    )
+
+    class Meta:
+        abstract = True
+
+    def save_model(self, request, obj, form, change):
+        if not obj.created_by:
+            obj.created_by = request.user
+        # Always save last update even when it is created
+        obj.updated_by = request.user
+        super().save_model(request, obj, form, change)
 
 
 class Parameters(models.Model):
@@ -70,8 +104,7 @@ class Parameters(models.Model):
         return False
 
 
-class ImagesizatorFile(models.Model):
-    created_at = models.DateTimeField(auto_now_add=True)
+class ImagesizatorFile(TimestampedModel):
     file_name = models.CharField(max_length=100, null=False)
     path = models.TextField(
         null=False,
