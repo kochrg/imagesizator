@@ -33,4 +33,10 @@ urlpatterns += [
         api.NewPublishFile.as_view(),
         name="new-publish-file",
     ),
+    # Delete file
+    path(
+        "delete/<protected>/<static>/<file_name>",
+        api.DeleteFile.as_view(),
+        name="delete-file",
+    ),
 ]

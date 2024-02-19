@@ -174,6 +174,8 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 SESSION_COOKIE_AGE = 60 * 60  # 60 Minutos
 SESSION_SAVE_EVERY_REQUEST = True
 
+# Change this value to upload large files
+DATA_UPLOAD_MAX_MEMORY_SIZE = 15728640  # = 15MB
 
 # custom settings for local environment
 try:  # noqa: SIM105

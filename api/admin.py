@@ -17,6 +17,7 @@ class ParametersAdmin(admin.ModelAdmin):
 class ImagesizatorFileAdmin(admin.ModelAdmin):
     list_display = (
         "created_at",
+        "created_by",
         "path",
     )
     search_fields = ("created_at", "path")
